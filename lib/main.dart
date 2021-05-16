@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:noon_reader/pages/home.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'pages/root/root.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ProviderScope(child: NoonReader()));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class NoonReader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: RootPage(),
     );
   }
 }
