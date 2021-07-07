@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:noon_reader/pages/explorer/explorer.dart';
 import 'package:noon_reader/pages/history/history.dart';
 import 'package:noon_reader/pages/setting/setting.dart';
+import 'package:noon_reader/widgets/noon_app_bar.dart';
 
 import 'root_viewmodel.dart';
 
@@ -28,10 +30,7 @@ class RootPage extends HookWidget {
     final selectedIndex = rootViewModel.selectedIndex;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Noon Reader'),
-        centerTitle: true,
-      ),
+      appBar: NoonAppBar(),
       body: Center(
         child: getSelectedPage(selectedIndex),
       ),
