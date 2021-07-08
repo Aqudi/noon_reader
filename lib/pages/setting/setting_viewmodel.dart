@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:noon_reader/constants/app.dart';
@@ -53,6 +54,11 @@ class SettingViewModel with ChangeNotifier {
       builder: (context) => OptionModal(
         title: 'Font family',
         options: AppConstants.fontFamilies,
+        builder: (dynamic fontFamily) => Text(
+          '$fontFamily',
+          style: GoogleFonts.getFont(fontFamily,
+              textStyle: Theme.of(context).textTheme.bodyText2),
+        ),
       ),
     );
     if (value != null) {
