@@ -30,6 +30,7 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
         sections: [
           SettingsSection(
             title: 'Viewer preview',
+            subtitle: Text('You can check the viewer with the settings.'),
             tiles: [],
           ),
         ],
