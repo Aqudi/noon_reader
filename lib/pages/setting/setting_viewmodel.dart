@@ -180,7 +180,7 @@ class SettingViewModel with ChangeNotifier {
     if (value != null) {
       _settingService.update(
         setting.copyWith(
-          padding: EdgeInsets.all(value),
+          padding: EdgeInsets.all(value * 1.0),
         ),
       );
       notifyListeners();
