@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:settings_ui/src/defines.dart';
 
 import 'package:noon_reader/widgets/viewer_container.dart';
 import 'package:noon_reader/utils/extensions.dart';
@@ -16,6 +17,8 @@ Duis a metus tellus. Orci varius natoque penatibus et magnis dis parturient mont
 
 Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhoncus sem. Maecenas pretium ligula ac auctor egestas. Nunc auctor elit in mattis tincidunt. Aliquam libero mauris, lacinia ac est lobortis, ullamcorper ultrices ipsum. Morbi non enim quis leo fringilla fermentum. Nulla rhoncus magna id leo accumsan hendrerit sed quis mauris. Duis bibendum erat sed nisl placerat, eget aliquam purus tincidunt. In id tincidunt nibh. Nunc egestas faucibus eros vitae tincidunt.''';
 
+  final titlePadding = defaultTitlePadding.copyWith(top: 10);
+
   Widget _buildSettingList({List<SettingsSection>? sections}) {
     return SettingsList(
       physics: NeverScrollableScrollPhysics(),
@@ -24,12 +27,41 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     );
   }
 
-  List<Widget> _buildViewerPreview(BuildContext context) {
+  Widget _buildCommonSection(BuildContext context) {
+    final settingViewModel = context.read(settingViewModelProvider);
+    final setting = settingViewModel.setting;
+
+    return _buildSettingList(
+      sections: [
+        SettingsSection(
+          title: 'Common',
+          titlePadding: titlePadding,
+          tiles: [
+            SettingsTile(
+              title: 'Language',
+              subtitle: setting.language,
+              leading: Icon(Icons.language),
+              onPressed: settingViewModel.languageOnPressed,
+            ),
+            SettingsTile.switchTile(
+              title: 'Dark mode',
+              leading: Icon(Icons.dark_mode),
+              onToggle: settingViewModel.darkModeOnToggle,
+              switchValue: setting.darkMode,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildViewerPreviewSection(BuildContext context) {
     return [
       _buildSettingList(
         sections: [
           SettingsSection(
             title: 'Viewer preview',
+            titlePadding: titlePadding,
             subtitle: Text('You can check the viewer with the settings.'),
             tiles: [],
           ),
@@ -42,97 +74,86 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     ];
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final settingViewModel = useProvider(settingViewModelProvider);
+  Widget _buildViewerSection(BuildContext context) {
+    final settingViewModel = context.read(settingViewModelProvider);
     final setting = settingViewModel.setting;
 
+    return _buildSettingList(
+      sections: [
+        SettingsSection(
+          title: 'Viewer',
+          titlePadding: titlePadding,
+          tiles: [
+            SettingsTile(
+              title: 'Font family',
+              subtitle: setting.fontFamily,
+              leading: Icon(Icons.text_format),
+              onPressed: settingViewModel.fontFamilyOnPressed,
+            ),
+            SettingsTile(
+              title: 'Font size',
+              subtitle: '${setting.fontSize}',
+              leading: Icon(Icons.format_size),
+              onPressed: settingViewModel.fontSizeOnPressed,
+            ),
+            SettingsTile(
+              title: 'Font weight',
+              subtitle: setting.fontWeight.toReadableName(),
+              leading: Icon(Icons.format_bold),
+              onPressed: settingViewModel.fontWeightOnPressed,
+            ),
+            SettingsTile(
+              title: 'Font color',
+              subtitle: setting.fontColor.toReadableName(),
+              leading: Icon(Icons.palette_outlined),
+              onPressed: settingViewModel.fontColorOnPressed,
+            ),
+            SettingsTile(
+              title: 'Background color',
+              subtitle: setting.backgroundColor.toReadableName(),
+              leading: Icon(Icons.format_paint_outlined),
+              onPressed: settingViewModel.backgroundColorOnPressed,
+            ),
+            SettingsTile(
+              title: 'Padding',
+              subtitle: '${setting.padding}',
+              leading: Icon(Icons.padding_outlined),
+              onPressed: settingViewModel.paddingOnPressed,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMiscSection(BuildContext context) {
+    return _buildSettingList(
+      sections: [
+        SettingsSection(
+          title: 'Misc',
+          titlePadding: titlePadding,
+          tiles: [
+            SettingsTile(
+                title: 'Terms of Service', leading: Icon(Icons.description)),
+            SettingsTile(
+                title: 'Open source licenses',
+                leading: Icon(Icons.collections_bookmark)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       child: SingleChildScrollView(
         child: Column(
           children: [
-            _buildSettingList(
-              sections: [
-                SettingsSection(
-                  title: 'Common',
-                  tiles: [
-                    SettingsTile(
-                      title: 'Language',
-                      subtitle: setting.language,
-                      leading: Icon(Icons.language),
-                      onPressed: settingViewModel.languageOnPressed,
-                    ),
-                    SettingsTile.switchTile(
-                      title: 'Dark mode',
-                      leading: Icon(Icons.dark_mode),
-                      onToggle: settingViewModel.darkModeOnToggle,
-                      switchValue: setting.darkMode,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            ..._buildViewerPreview(context),
-            _buildSettingList(
-              sections: [
-                SettingsSection(
-                  title: 'Viewer',
-                  tiles: [
-                    SettingsTile(
-                      title: 'Font family',
-                      subtitle: setting.fontFamily,
-                      leading: Icon(Icons.text_format),
-                      onPressed: settingViewModel.fontFamilyOnPressed,
-                    ),
-                    SettingsTile(
-                      title: 'Font size',
-                      subtitle: '${setting.fontSize}',
-                      leading: Icon(Icons.format_size),
-                      onPressed: settingViewModel.fontSizeOnPressed,
-                    ),
-                    SettingsTile(
-                      title: 'Font weight',
-                      subtitle: setting.fontWeight.toReadableName(),
-                      leading: Icon(Icons.format_bold),
-                      onPressed: settingViewModel.fontWeightOnPressed,
-                    ),
-                    SettingsTile(
-                      title: 'Font color',
-                      subtitle: setting.fontColor.toReadableName(),
-                      leading: Icon(Icons.palette_outlined),
-                      onPressed: settingViewModel.fontColorOnPressed,
-                    ),
-                    SettingsTile(
-                      title: 'Background color',
-                      subtitle: setting.backgroundColor.toReadableName(),
-                      leading: Icon(Icons.format_paint_outlined),
-                      onPressed: settingViewModel.backgroundColorOnPressed,
-                    ),
-                    SettingsTile(
-                      title: 'Padding',
-                      subtitle: '${setting.padding}',
-                      leading: Icon(Icons.padding_outlined),
-                      onPressed: settingViewModel.paddingOnPressed,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            _buildSettingList(
-              sections: [
-                SettingsSection(
-                  title: 'Misc',
-                  tiles: [
-                    SettingsTile(
-                        title: 'Terms of Service',
-                        leading: Icon(Icons.description)),
-                    SettingsTile(
-                        title: 'Open source licenses',
-                        leading: Icon(Icons.collections_bookmark)),
-                  ],
-                ),
-              ],
-            ),
+            _buildCommonSection(context),
+            ..._buildViewerPreviewSection(context),
+            _buildViewerSection(context),
+            _buildMiscSection(context),
           ],
         ),
       ),
