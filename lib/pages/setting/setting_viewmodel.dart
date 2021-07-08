@@ -76,7 +76,7 @@ class SettingViewModel with ChangeNotifier {
     if (value != null) {
       _settingService.update(
         setting.copyWith(
-          fontSize: value,
+          fontSize: value * 1.0,
         ),
       );
       notifyListeners();
