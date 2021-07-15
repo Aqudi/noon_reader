@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -28,24 +30,28 @@ enum EdgeInsetsDirections {
   right,
 }
 
-class EdgeInsetsSerializer
-    implements JsonConverter<EdgeInsets, Map<EdgeInsetsDirections, double>> {
+class EdgeInsetsSerializer implements JsonConverter<EdgeInsets, String> {
   const EdgeInsetsSerializer();
 
   @override
-  EdgeInsets fromJson(Map<EdgeInsetsDirections, double> json) =>
-      EdgeInsets.only(
-        top: json[EdgeInsetsDirections.top] ?? 0,
-        bottom: json[EdgeInsetsDirections.bottom] ?? 0,
-        left: json[EdgeInsetsDirections.left] ?? 0,
-        right: json[EdgeInsetsDirections.right] ?? 0,
-      );
+  EdgeInsets fromJson(String json) {
+    final map = jsonDecode(json);
+    return EdgeInsets.only(
+      top: map[EdgeInsetsDirections.top.toString()] ?? 0,
+      bottom: map[EdgeInsetsDirections.bottom.toString()] ?? 0,
+      left: map[EdgeInsetsDirections.left.toString()] ?? 0,
+      right: map[EdgeInsetsDirections.right.toString()] ?? 0,
+    );
+  }
 
   @override
-  Map<EdgeInsetsDirections, double> toJson(EdgeInsets edgeInsets) => {
-        EdgeInsetsDirections.top: edgeInsets.top,
-        EdgeInsetsDirections.bottom: edgeInsets.bottom,
-        EdgeInsetsDirections.left: edgeInsets.left,
-        EdgeInsetsDirections.right: edgeInsets.right,
-      };
+  String toJson(EdgeInsets edgeInsets) {
+    final map = {
+      EdgeInsetsDirections.top.toString(): edgeInsets.top,
+      EdgeInsetsDirections.bottom.toString(): edgeInsets.bottom,
+      EdgeInsetsDirections.left.toString(): edgeInsets.left,
+      EdgeInsetsDirections.right.toString(): edgeInsets.right,
+    };
+    return jsonEncode(map);
+  }
 }

@@ -17,8 +17,7 @@ _$_Setting _$_$_SettingFromJson(Map<String, dynamic> json) {
     fontColor: const ColorSerialiser().fromJson(json['fontColor'] as int),
     backgroundColor:
         const ColorSerialiser().fromJson(json['backgroundColor'] as int),
-    padding: const EdgeInsetsSerializer()
-        .fromJson(json['padding'] as Map<EdgeInsetsDirections, double>),
+    padding: const EdgeInsetsSerializer().fromJson(json['padding'] as String),
   );
 }
 
