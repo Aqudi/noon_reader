@@ -25,3 +25,9 @@ extension ColorReadable on Color {
     return '0x${value.toRadixString(16).toUpperCase()}';
   }
 }
+
+extension EdgeInsetsReadable on EdgeInsets {
+  String toReadable() {
+    return 'left: $left, right: $right, top: $top, bottom: $bottom';
+  }
+}

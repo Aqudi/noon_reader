@@ -116,7 +116,7 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
             ),
             SettingsTile(
               title: 'Padding',
-              subtitle: '${setting.padding}',
+              subtitle: '${setting.padding.toReadable()}',
               leading: Icon(Icons.padding_outlined),
               onPressed: settingViewModel.paddingOnPressed,
             ),
