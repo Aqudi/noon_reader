@@ -21,6 +21,12 @@ class SettingViewModel with ChangeNotifier {
   SettingService get _settingService => read(settingServiceProvider);
   Setting get setting => _settingService.setting;
 
+  @override
+  void notifyListeners() {
+    _settingService.save();
+    super.notifyListeners();
+  }
+
   void darkModeOnToggle(bool value) {
     _settingService.update(
       setting.copyWith(

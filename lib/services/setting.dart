@@ -4,30 +4,46 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/constants/app.dart';
 
 import 'package:noon_reader/models/setting.dart';
+import 'package:noon_reader/services/storage.dart';
 
-final settingServiceProvider = ChangeNotifierProvider<SettingService>(
-  (ref) => SettingService(),
-);
+final settingServiceProvider = ChangeNotifierProvider<SettingService>((ref) {
+  final storageService = ref.read(storageServiceProvider);
+  return SettingService(storageService);
+});
 
 class SettingService extends ChangeNotifier {
+  final StorageService _storageService;
+  final storageKey = 'setting';
+
   late Setting _setting;
+  final Setting _defaultSetting = Setting(
+    darkMode: true,
+    language: AppConstants.defaultLanguage,
+    fontFamily: AppConstants.defaultFontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    fontColor: Colors.white70,
+    backgroundColor: Colors.black,
+    padding: EdgeInsets.all(12),
+  );
 
-  Setting get setting => _setting;
-
-  SettingService() {
-    _setting = Setting(
-      darkMode: true,
-      language: AppConstants.defaultLanguage,
-      fontFamily: AppConstants.defaultFontFamily,
-      fontSize: 14,
-      fontWeight: FontWeight.normal,
-      fontColor: Colors.white70,
-      backgroundColor: Colors.black,
-      padding: const EdgeInsets.all(12),
-    );
+  SettingService(this._storageService) {
+    _setting = load();
   }
 
-  void load() {}
+  Setting get setting => _setting;
+  bool get isDefaultSetting => _setting == _defaultSetting;
+
+  Setting load() {
+    final settingJson = _storageService.get(BoxName.setting, storageKey);
+    return settingJson != null
+        ? Setting.fromJson(settingJson)
+        : _defaultSetting;
+  }
+
+  Future<void> save() async {
+    await _storageService.put(BoxName.setting, storageKey, setting.toJson());
+  }
 
   void update(Setting setting) {
     _setting = setting;
