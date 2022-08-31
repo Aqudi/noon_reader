@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:settings_ui/src/defines.dart';
 
 import 'package:noon_reader/widgets/viewer_container.dart';
 import 'package:noon_reader/utils/extensions.dart';
 
 import 'setting_viewmodel.dart';
 
-class SettingPage extends HookWidget {
+class SettingPage extends HookConsumerWidget {
   final lorem =
       '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet tortor vitae sagittis efficitur. Duis posuere nisl quam, sed lacinia purus dignissim sed. Aenean ornare justo molestie mauris finibus scelerisque. Nunc a est posuere, tempus enim a, rhoncus erat. Ut fringilla arcu vel ipsum faucibus, ut vestibulum nisl fermentum. Nullam efficitur laoreet mi, sed iaculis tellus tristique vitae. Nullam a ornare dolor. Nulla auctor, purus et vestibulum volutpat, ligula metus rhoncus felis, eget luctus mauris elit sed est. Proin scelerisque purus varius est egestas consequat. Donec suscipit nulla eu est condimentum blandit. Curabitur tempor neque vitae nisl tincidunt, cursus sagittis ipsum eleifend. In hendrerit leo eu ipsum tincidunt, vel mattis ante finibus. In eget efficitur dui. Aenean leo ex, auctor in est sed, vehicula euismod ante. Cras ullamcorper, risus vitae suscipit pellentesque, eros ipsum sagittis dolor, ullamcorper volutpat quam libero vel augue.
 
@@ -17,37 +15,36 @@ Duis a metus tellus. Orci varius natoque penatibus et magnis dis parturient mont
 
 Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhoncus sem. Maecenas pretium ligula ac auctor egestas. Nunc auctor elit in mattis tincidunt. Aliquam libero mauris, lacinia ac est lobortis, ullamcorper ultrices ipsum. Morbi non enim quis leo fringilla fermentum. Nulla rhoncus magna id leo accumsan hendrerit sed quis mauris. Duis bibendum erat sed nisl placerat, eget aliquam purus tincidunt. In id tincidunt nibh. Nunc egestas faucibus eros vitae tincidunt.''';
 
-  final titlePadding = defaultTitlePadding.copyWith(top: 10);
+  const SettingPage({Key? key}) : super(key: key);
 
-  Widget _buildSettingList({List<SettingsSection>? sections}) {
+  Widget _buildSettingList({required List<SettingsSection> sections}) {
     return SettingsList(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       sections: sections,
     );
   }
 
-  Widget _buildCommonSection(BuildContext context) {
-    final settingViewModel = context.read(settingViewModelProvider);
+  Widget _buildCommonSection(WidgetRef ref, BuildContext context) {
+    final settingViewModel = ref.read(settingViewModelProvider);
     final setting = settingViewModel.setting;
 
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: 'Common',
-          titlePadding: titlePadding,
+          title: const Text('Common'),
           tiles: [
             SettingsTile(
-              title: 'Language',
-              subtitle: setting.language,
-              leading: Icon(Icons.language),
+              title: const Text('Language'),
+              description: Text(setting.language),
+              leading: const Icon(Icons.language),
               onPressed: settingViewModel.languageOnPressed,
             ),
             SettingsTile.switchTile(
-              title: 'Dark mode',
-              leading: Icon(Icons.dark_mode),
+              title: const Text('Dark mode'),
+              leading: const Icon(Icons.dark_mode),
               onToggle: settingViewModel.darkModeOnToggle,
-              switchValue: setting.darkMode,
+              initialValue: setting.darkMode,
             ),
           ],
         ),
@@ -59,65 +56,62 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     return [
       _buildSettingList(
         sections: [
-          SettingsSection(
-            title: 'Viewer preview',
-            titlePadding: titlePadding,
-            subtitle: Text('You can check the viewer with the settings.'),
+          const SettingsSection(
+            title: Text('Viewer preview'),
             tiles: [],
           ),
         ],
       ),
-      Container(
+      SizedBox(
         height: MediaQuery.of(context).size.height * 0.2,
         child: ViewerContainer(lorem),
       ),
     ];
   }
 
-  Widget _buildViewerSection(BuildContext context) {
-    final settingViewModel = context.read(settingViewModelProvider);
+  Widget _buildViewerSection(WidgetRef ref, BuildContext context) {
+    final settingViewModel = ref.read(settingViewModelProvider);
     final setting = settingViewModel.setting;
 
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: 'Viewer',
-          titlePadding: titlePadding,
+          title: const Text('Viewer'),
           tiles: [
             SettingsTile(
-              title: 'Font family',
-              subtitle: setting.fontFamily,
-              leading: Icon(Icons.text_format),
+              title: const Text('Font family'),
+              description: Text(setting.fontFamily),
+              leading: const Icon(Icons.text_format),
               onPressed: settingViewModel.fontFamilyOnPressed,
             ),
             SettingsTile(
-              title: 'Font size',
-              subtitle: '${setting.fontSize}',
-              leading: Icon(Icons.format_size),
+              title: const Text('Font size'),
+              description: Text('${setting.fontSize}'),
+              leading: const Icon(Icons.format_size),
               onPressed: settingViewModel.fontSizeOnPressed,
             ),
             SettingsTile(
-              title: 'Font weight',
-              subtitle: setting.fontWeight.toReadableName(),
-              leading: Icon(Icons.format_bold),
+              title: const Text('Font weight'),
+              description: Text(setting.fontWeight.toReadableName()),
+              leading: const Icon(Icons.format_bold),
               onPressed: settingViewModel.fontWeightOnPressed,
             ),
             SettingsTile(
-              title: 'Font color',
-              subtitle: setting.fontColor.toReadableName(),
-              leading: Icon(Icons.palette_outlined),
+              title: const Text('Font color'),
+              description: Text(setting.fontColor.toReadableName()),
+              leading: const Icon(Icons.palette_outlined),
               onPressed: settingViewModel.fontColorOnPressed,
             ),
             SettingsTile(
-              title: 'Background color',
-              subtitle: setting.backgroundColor.toReadableName(),
-              leading: Icon(Icons.format_paint_outlined),
+              title: const Text('Background color'),
+              description: Text(setting.backgroundColor.toReadableName()),
+              leading: const Icon(Icons.format_paint_outlined),
               onPressed: settingViewModel.backgroundColorOnPressed,
             ),
             SettingsTile(
-              title: 'Padding',
-              subtitle: '${setting.padding.toReadable()}',
-              leading: Icon(Icons.padding_outlined),
+              title: const Text('Padding'),
+              description: Text(setting.padding.toReadable()),
+              leading: const Icon(Icons.padding_outlined),
               onPressed: settingViewModel.paddingOnPressed,
             ),
           ],
@@ -130,14 +124,16 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: 'Misc',
-          titlePadding: titlePadding,
+          title: const Text('Misc'),
           tiles: [
             SettingsTile(
-                title: 'Terms of Service', leading: Icon(Icons.description)),
+              title: const Text('Terms of Service'),
+              leading: const Icon(Icons.description),
+            ),
             SettingsTile(
-                title: 'Open source licenses',
-                leading: Icon(Icons.collections_bookmark)),
+              title: const Text('Open source licenses'),
+              leading: const Icon(Icons.collections_bookmark),
+            ),
           ],
         ),
       ],
@@ -145,17 +141,15 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildCommonSection(context),
-            ..._buildViewerPreviewSection(context),
-            _buildViewerSection(context),
-            _buildMiscSection(context),
-          ],
-        ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildCommonSection(ref, context),
+          ..._buildViewerPreviewSection(context),
+          _buildViewerSection(ref, context),
+          _buildMiscSection(context),
+        ],
       ),
     );
   }

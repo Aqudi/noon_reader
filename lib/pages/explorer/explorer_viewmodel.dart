@@ -5,7 +5,7 @@ import 'package:noon_reader/pages/viewer/viewer.dart';
 import '../../services/storage.dart';
 
 final explorerViewModelProvider =
-    ChangeNotifierProvider((ref) => ExplorerViewModel(ref.read));
+    ChangeNotifierProvider<ExplorerViewModel>((ref) => ExplorerViewModel(ref.read));
 
 class ExplorerViewModel with ChangeNotifier {
   late StorageService storageService;
@@ -27,5 +27,6 @@ class ExplorerViewModel with ChangeNotifier {
     } else {
       return '파일을 불러오지 못했습니다.';
     }
+    return null;
   }
 }

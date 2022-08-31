@@ -11,14 +11,15 @@ import 'package:noon_reader/widgets/floating_modal.dart';
 import 'widgets/widgets.dart';
 
 final settingViewModelProvider =
-    ChangeNotifierProvider((ref) => SettingViewModel(ref.read));
+    ChangeNotifierProvider<SettingViewModel>((ref) {
+  final settingService = ref.read(settingServiceProvider);
+  return SettingViewModel(settingService);
+});
 
 class SettingViewModel with ChangeNotifier {
-  final Reader read;
+  SettingViewModel(this._settingService);
 
-  SettingViewModel(this.read);
-
-  SettingService get _settingService => read(settingServiceProvider);
+  final SettingService _settingService;
   Setting get setting => _settingService.setting;
 
   @override
@@ -39,7 +40,7 @@ class SettingViewModel with ChangeNotifier {
   void languageOnPressed(BuildContext context) async {
     final value = await showFloatingModalBottomSheet(
       context: context,
-      builder: (context) => OptionModal(
+      builder: (context) => const OptionModal(
         title: 'Language',
         options: AppConstants.languages,
       ),
@@ -118,7 +119,7 @@ class SettingViewModel with ChangeNotifier {
       context: context,
       builder: (context) => OptionModal(
           title: 'Font color',
-          options: [
+          options: const [
             Colors.black,
             Colors.white,
             Colors.red,
@@ -152,7 +153,7 @@ class SettingViewModel with ChangeNotifier {
       context: context,
       builder: (context) => OptionModal(
           title: 'Background color',
-          options: [
+          options: const [
             Colors.black,
             Colors.white,
             Colors.red,

@@ -24,7 +24,7 @@ class SettingService extends ChangeNotifier {
     fontWeight: FontWeight.normal,
     fontColor: Colors.white70,
     backgroundColor: Colors.black,
-    padding: EdgeInsets.all(12),
+    padding: const EdgeInsets.all(12),
   );
 
   SettingService(this._storageService) {

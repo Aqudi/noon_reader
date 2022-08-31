@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:noon_reader/pages/explorer/explorer.dart';
@@ -9,7 +8,7 @@ import 'package:noon_reader/widgets/noon_app_bar.dart';
 
 import 'root_viewmodel.dart';
 
-class RootPage extends HookWidget {
+class RootPage extends HookConsumerWidget {
   Widget getSelectedPage(int index) {
     switch (index) {
       case 0:
@@ -17,27 +16,27 @@ class RootPage extends HookWidget {
       case 1:
         return ExplorerPage();
       case 2:
-        return SettingPage();
+        return const SettingPage();
       default:
-        return Center(child: Text('404 Page not found'));
+        return const Center(child: Text('404 Page not found'));
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final rootViewModel = useProvider(rootViewModelProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rootViewModel = ref.watch(rootViewModelProvider);
 
     final selectedIndex = rootViewModel.selectedIndex;
 
     return Scaffold(
-      appBar: NoonAppBar(),
+      appBar: const NoonAppBar(),
       body: Center(
         child: getSelectedPage(selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: rootViewModel.setSelectedIndex,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
             label: 'History',

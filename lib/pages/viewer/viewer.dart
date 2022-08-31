@@ -12,7 +12,7 @@ class ViewerPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: NoonAppBar(),
+      appBar: const NoonAppBar(),
       body: ViewerContainer(content),
     );
   }

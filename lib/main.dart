@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/constants/app.dart';
 import 'package:noon_reader/services/setting.dart';
@@ -24,10 +23,10 @@ void main() async {
   );
 }
 
-class NoonReader extends HookWidget {
+class NoonReader extends HookConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final settingService = useProvider(settingServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingService = ref.watch(settingServiceProvider);
     final textTheme = settingService.getTextTheme(context);
 
     return MaterialApp(

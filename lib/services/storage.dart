@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,7 +14,7 @@ enum BoxName {
 }
 
 class StorageService {
-  final utf8Decoder = Utf8Decoder();
+  final utf8Decoder = const Utf8Decoder();
 
   bool initialized = false;
   final boxes = <BoxName, Box<String>>{};
@@ -32,10 +31,11 @@ class StorageService {
         return utf8Decoder.convert(bytes!);
       }
     } on PlatformException catch (e) {
-      throw Exception('Unsupported operation' + e.toString());
+      throw Exception('Unsupported operation$e');
     } catch (ex) {
       throw Exception(ex);
     }
+    return null;
   }
 
   Future<void> init() async {
@@ -60,6 +60,7 @@ class StorageService {
     } catch (e) {
       return null;
     }
+    return null;
   }
 
   void delete(BoxName boxName, String key) {
