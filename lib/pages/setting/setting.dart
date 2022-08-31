@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:noon_reader/pages/setting/widgets/option_modal.dart';
+import 'package:noon_reader/widgets/floating_modal.dart';
+import 'package:noon_reader/widgets/loading_indicator.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:noon_reader/widgets/viewer_container.dart';
@@ -8,14 +11,23 @@ import 'package:noon_reader/utils/extensions.dart';
 import 'setting_viewmodel.dart';
 
 class SettingPage extends HookConsumerWidget {
-  final lorem =
-      '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet tortor vitae sagittis efficitur. Duis posuere nisl quam, sed lacinia purus dignissim sed. Aenean ornare justo molestie mauris finibus scelerisque. Nunc a est posuere, tempus enim a, rhoncus erat. Ut fringilla arcu vel ipsum faucibus, ut vestibulum nisl fermentum. Nullam efficitur laoreet mi, sed iaculis tellus tristique vitae. Nullam a ornare dolor. Nulla auctor, purus et vestibulum volutpat, ligula metus rhoncus felis, eget luctus mauris elit sed est. Proin scelerisque purus varius est egestas consequat. Donec suscipit nulla eu est condimentum blandit. Curabitur tempor neque vitae nisl tincidunt, cursus sagittis ipsum eleifend. In hendrerit leo eu ipsum tincidunt, vel mattis ante finibus. In eget efficitur dui. Aenean leo ex, auctor in est sed, vehicula euismod ante. Cras ullamcorper, risus vitae suscipit pellentesque, eros ipsum sagittis dolor, ullamcorper volutpat quam libero vel augue.
-
-Duis a metus tellus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam felis ante, pretium sit amet hendrerit sed, mattis et metus. In egestas ligula tempor, consectetur enim eget, tincidunt magna. Morbi rhoncus, nisi non sodales facilisis, sapien nisl gravida erat, quis aliquam leo quam ut enim. Maecenas viverra accumsan pulvinar. In vulputate nisl vitae fermentum aliquet. Ut vel ante ac diam scelerisque porttitor. Nulla cursus a velit et imperdiet. Donec euismod consequat justo eu rhoncus. Pellentesque augue leo, pellentesque nec pellentesque vitae, elementum et nibh. Pellentesque fringilla elit vel laoreet placerat. Quisque vehicula feugiat tellus in malesuada.
-
-Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhoncus sem. Maecenas pretium ligula ac auctor egestas. Nunc auctor elit in mattis tincidunt. Aliquam libero mauris, lacinia ac est lobortis, ullamcorper ultrices ipsum. Morbi non enim quis leo fringilla fermentum. Nulla rhoncus magna id leo accumsan hendrerit sed quis mauris. Duis bibendum erat sed nisl placerat, eget aliquam purus tincidunt. In id tincidunt nibh. Nunc egestas faucibus eros vitae tincidunt.''';
-
   const SettingPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingViewModel = ref.read(settingViewModelProvider);
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildCommonSection(settingViewModel, context),
+          ..._buildViewerPreviewSection(settingViewModel, context),
+          _buildViewerSection(settingViewModel, context),
+          _buildMiscSection(context),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSettingList({required List<SettingsSection> sections}) {
     return SettingsList(
@@ -25,8 +37,8 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     );
   }
 
-  Widget _buildCommonSection(WidgetRef ref, BuildContext context) {
-    final settingViewModel = ref.read(settingViewModelProvider);
+  Widget _buildCommonSection(
+      SettingViewModel settingViewModel, BuildContext context) {
     final setting = settingViewModel.setting;
 
     return _buildSettingList(
@@ -52,7 +64,8 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
     );
   }
 
-  List<Widget> _buildViewerPreviewSection(BuildContext context) {
+  List<Widget> _buildViewerPreviewSection(
+      SettingViewModel settingViewModel, BuildContext context) {
     return [
       _buildSettingList(
         sections: [
@@ -64,13 +77,25 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
       ),
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.2,
-        child: ViewerContainer(lorem),
+        child: FutureBuilder<String>(
+            future: settingViewModel.loadSampleText(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ViewerContainer(snapshot.data ?? "");
+              }
+
+              if (snapshot.hasError) {
+                return const ViewerContainer("알 수 없는 오류");
+              }
+
+              return const LoadingIndicator();
+            }),
       ),
     ];
   }
 
-  Widget _buildViewerSection(WidgetRef ref, BuildContext context) {
-    final settingViewModel = ref.read(settingViewModelProvider);
+  Widget _buildViewerSection(
+      SettingViewModel settingViewModel, BuildContext context) {
     final setting = settingViewModel.setting;
 
     return _buildSettingList(
@@ -106,13 +131,45 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
               title: const Text('Background color'),
               description: Text(setting.backgroundColor.toReadableName()),
               leading: const Icon(Icons.format_paint_outlined),
-              onPressed: settingViewModel.backgroundColorOnPressed,
+              onPressed: (context) => settingViewModel.backgroundColorOnPressed(
+                () async => showFloatingModalBottomSheet<Color?>(
+                  context: context,
+                  builder: (context) => OptionModal(
+                      title: 'Background color',
+                      options: const [
+                        Colors.black,
+                        Colors.white,
+                        Colors.red,
+                        Colors.blue,
+                        Colors.green,
+                        Colors.yellow
+                      ],
+                      builder: (value) => Row(
+                            children: [
+                              Container(
+                                color: Color(value.value),
+                                padding: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.only(right: 16),
+                              ),
+                              Text(Color(value.value).toReadableName()),
+                            ],
+                          )),
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text('Padding'),
               description: Text(setting.padding.toReadable()),
               leading: const Icon(Icons.padding_outlined),
-              onPressed: settingViewModel.paddingOnPressed,
+              onPressed: (context) => settingViewModel.paddingOnPressed(
+                () async => showFloatingModalBottomSheet<double?>(
+                  context: context,
+                  builder: (context) => OptionModal(
+                    title: 'Padding',
+                    options: List.generate(30, (index) => index),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -137,20 +194,6 @@ Cras molestie luctus dolor, nec faucibus libero pellentesque ut. Duis vitae rhon
           ],
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildCommonSection(ref, context),
-          ..._buildViewerPreviewSection(context),
-          _buildViewerSection(ref, context),
-          _buildMiscSection(context),
-        ],
-      ),
     );
   }
 }

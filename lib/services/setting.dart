@@ -6,12 +6,12 @@ import 'package:noon_reader/constants/app.dart';
 import 'package:noon_reader/models/setting.dart';
 import 'package:noon_reader/services/storage.dart';
 
-final settingServiceProvider = ChangeNotifierProvider<SettingService>((ref) {
+final settingServiceProvider = Provider<SettingService>((ref) {
   final storageService = ref.read(storageServiceProvider);
   return SettingService(storageService);
 });
 
-class SettingService extends ChangeNotifier {
+class SettingService {
   final StorageService _storageService;
   final storageKey = 'setting';
 
@@ -47,7 +47,7 @@ class SettingService extends ChangeNotifier {
 
   void update(Setting setting) {
     _setting = setting;
-    notifyListeners();
+    save();
   }
 
   TextTheme getTextTheme(BuildContext context) {

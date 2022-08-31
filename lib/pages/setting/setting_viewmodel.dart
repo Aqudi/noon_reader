@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:noon_reader/constants/app.dart';
 import 'package:noon_reader/models/setting.dart';
+import 'package:noon_reader/resources/resources.dart';
 import 'package:noon_reader/services/setting.dart';
 import 'package:noon_reader/utils/extensions.dart';
 import 'package:noon_reader/widgets/floating_modal.dart';
@@ -12,7 +14,7 @@ import 'widgets/widgets.dart';
 
 final settingViewModelProvider =
     ChangeNotifierProvider<SettingViewModel>((ref) {
-  final settingService = ref.read(settingServiceProvider);
+  final settingService = ref.watch(settingServiceProvider);
   return SettingViewModel(settingService);
 });
 
@@ -22,10 +24,8 @@ class SettingViewModel with ChangeNotifier {
   final SettingService _settingService;
   Setting get setting => _settingService.setting;
 
-  @override
-  void notifyListeners() {
-    _settingService.save();
-    super.notifyListeners();
+  Future<String> loadSampleText() {
+    return rootBundle.loadString(Assets.sampleLorem);
   }
 
   void darkModeOnToggle(bool value) {
@@ -148,30 +148,8 @@ class SettingViewModel with ChangeNotifier {
     }
   }
 
-  void backgroundColorOnPressed(BuildContext context) async {
-    final value = await showFloatingModalBottomSheet(
-      context: context,
-      builder: (context) => OptionModal(
-          title: 'Background color',
-          options: const [
-            Colors.black,
-            Colors.white,
-            Colors.red,
-            Colors.blue,
-            Colors.green,
-            Colors.yellow
-          ],
-          builder: (value) => Row(
-                children: [
-                  Container(
-                    color: Color(value.value),
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.only(right: 16),
-                  ),
-                  Text(Color(value.value).toReadableName()),
-                ],
-              )),
-    );
+  void backgroundColorOnPressed(Future<Color?> Function() builder) async {
+    final value = await builder();
     if (value != null) {
       _settingService.update(
         setting.copyWith(
@@ -182,14 +160,8 @@ class SettingViewModel with ChangeNotifier {
     }
   }
 
-  void paddingOnPressed(BuildContext context) async {
-    final value = await showFloatingModalBottomSheet(
-      context: context,
-      builder: (context) => OptionModal(
-        title: 'Padding',
-        options: List.generate(30, (index) => index),
-      ),
-    );
+  void paddingOnPressed(Future<double?> Function() builder) async {
+    final value = await builder();
     if (value != null) {
       _settingService.update(
         setting.copyWith(
