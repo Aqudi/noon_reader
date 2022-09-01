@@ -11,6 +11,7 @@ final storageServiceProvider = Provider<StorageService>(
 
 enum BoxName {
   setting,
+  history,
 }
 
 class StorageService {
@@ -19,21 +20,28 @@ class StorageService {
   bool initialized = false;
   final boxes = <BoxName, Box<String>>{};
 
-  /// Pick and return txt file
-  Future<String?> pickAndReadTextFile() async {
+  Future<PlatformFile?> pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['txt'],
+        withReadStream: true,
+        withData: true,
       );
-      if (result != null && result.files.first.bytes != null) {
-        final bytes = result.files.first.bytes;
-        return utf8Decoder.convert(bytes!);
+      if (result != null) {
+        return result.files.single;
       }
     } on PlatformException catch (e) {
       throw Exception('Unsupported operation$e');
     } catch (ex) {
       throw Exception(ex);
+    }
+    return null;
+  }
+
+  Future<String?> readFileAsString(PlatformFile file) async {
+    if (file.bytes != null) {
+      return utf8Decoder.convert(file.bytes!);
     }
     return null;
   }

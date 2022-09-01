@@ -6,12 +6,12 @@ import 'package:noon_reader/constants/app.dart';
 import 'package:noon_reader/models/setting.dart';
 import 'package:noon_reader/services/storage.dart';
 
-final settingServiceProvider = Provider<SettingService>((ref) {
+final settingServiceProvider = ChangeNotifierProvider<SettingService>((ref) {
   final storageService = ref.read(storageServiceProvider);
   return SettingService(storageService);
 });
 
-class SettingService {
+class SettingService extends ChangeNotifier {
   final StorageService _storageService;
   final storageKey = 'setting';
 
@@ -43,6 +43,7 @@ class SettingService {
 
   Future<void> save() async {
     await _storageService.put(BoxName.setting, storageKey, setting.toJson());
+    notifyListeners();
   }
 
   void update(Setting setting) {

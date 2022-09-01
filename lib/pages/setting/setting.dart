@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/pages/setting/widgets/option_modal.dart';
 import 'package:noon_reader/widgets/floating_modal.dart';
@@ -15,7 +16,7 @@ class SettingPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settingViewModel = ref.read(settingViewModelProvider);
+    final settingViewModel = ref.watch(settingViewModelProvider);
 
     return SingleChildScrollView(
       child: Column(
@@ -77,19 +78,33 @@ class SettingPage extends HookConsumerWidget {
       ),
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.2,
-        child: FutureBuilder<String>(
-            future: settingViewModel.loadSampleText(),
-            builder: (context, snapshot) {
+        child: HookBuilder(
+          builder: (context) {
+            final snapshot = useFuture(settingViewModel.loadSampleText());
+
+            late Widget widget;
+
+            if (snapshot.connectionState != ConnectionState.done) {
+              widget = const LoadingIndicator();
+            } else {
+              String? content;
               if (snapshot.hasData) {
-                return ViewerContainer(snapshot.data ?? "");
+                content = snapshot.data;
               }
 
               if (snapshot.hasError) {
-                return const ViewerContainer("알 수 없는 오류");
+                content = "알 수 없는 오류";
               }
 
-              return const LoadingIndicator();
-            }),
+              widget = ViewerContainer(
+                content: content?.split("\n"),
+                setting: settingViewModel.setting,
+              );
+            }
+
+            return widget;
+          },
+        ),
       ),
     ];
   }

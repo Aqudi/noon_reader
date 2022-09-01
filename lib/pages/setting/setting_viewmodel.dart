@@ -83,7 +83,7 @@ class SettingViewModel with ChangeNotifier {
       context: context,
       builder: (context) => OptionModal(
         title: 'Font size',
-        options: List.generate(20, (index) => index + 8),
+        options: List.generate(70, (index) => index + 8),
       ),
     );
     if (value != null) {
