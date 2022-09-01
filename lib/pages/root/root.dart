@@ -9,12 +9,14 @@ import 'package:noon_reader/widgets/noon_app_bar.dart';
 import 'root_viewmodel.dart';
 
 class RootPage extends HookConsumerWidget {
+  const RootPage({Key? key}) : super(key: key);
+
   Widget getSelectedPage(int index) {
     switch (index) {
       case 0:
-        return HistoryPage();
+        return const HistoryPage();
       case 1:
-        return ExplorerPage();
+        return const ExplorerPage();
       case 2:
         return const SettingPage();
       default:

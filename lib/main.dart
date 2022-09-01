@@ -18,12 +18,14 @@ void main() async {
       overrides: [
         storageServiceProvider.overrideWithValue(storageService),
       ],
-      child: NoonReader(),
+      child: const NoonReader(),
     ),
   );
 }
 
 class NoonReader extends HookConsumerWidget {
+  const NoonReader({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingService = ref.watch(settingServiceProvider);
@@ -37,7 +39,7 @@ class NoonReader extends HookConsumerWidget {
           settingService.setting.darkMode ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
-        builder: (context, snapshot) => RootPage(),
+        builder: (context, snapshot) => const RootPage(),
       ),
     );
   }
