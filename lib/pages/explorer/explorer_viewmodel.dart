@@ -1,11 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:noon_reader/pages/viewer/viewer.dart';
 
 import '../../services/storage.dart';
 
-final explorerViewModelProvider =
-    ChangeNotifierProvider<ExplorerViewModel>((ref) => ExplorerViewModel(ref.read));
+final explorerViewModelProvider = ChangeNotifierProvider<ExplorerViewModel>(
+    (ref) => ExplorerViewModel(ref.read));
 
 class ExplorerViewModel with ChangeNotifier {
   late StorageService storageService;
@@ -15,18 +15,12 @@ class ExplorerViewModel with ChangeNotifier {
     storageService = reader(storageServiceProvider);
   }
 
-  Future<String?> pickAndReadTextFile(BuildContext context) async {
-    final text = await storageService.pickAndReadTextFile();
-    if (text != null) {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ViewerPage(content: text),
-        ),
-      );
-    } else {
-      return '파일을 불러오지 못했습니다.';
+  Future<PlatformFile?> pickFile() async {
+    try {
+      final file = await storageService.pickFile();
+      return file;
+    } catch (ex) {
+      throw Exception(ex);
     }
-    return null;
   }
 }
