@@ -71,6 +71,10 @@ class StorageService {
     return null;
   }
 
+  List? getKeys(BoxName boxName) {
+    return boxes[boxName]?.keys.toList();
+  }
+
   void delete(BoxName boxName, String key) {
     boxes[boxName]!.delete(key);
   }

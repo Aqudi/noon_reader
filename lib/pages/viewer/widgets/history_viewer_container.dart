@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,7 +23,7 @@ class CustomText extends StatelessWidget {
 class HistoryViewerContainer extends HookConsumerWidget {
   final String? content;
 
-  final Function(ValueNotifier<bool>)? initializer;
+  final void Function(ValueNotifier<bool>, {int maxIndex}) initializer;
   final Setting? setting;
   final double opacity;
   final int initialIndex;
@@ -46,8 +47,6 @@ class HistoryViewerContainer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lines = useMemoized(() => content?.split("\n")) ?? [];
-
     // Text가 초기화 및 initialIndex로 이동 후 보이도록 제어
     final visible = useState(false);
 
@@ -68,7 +67,10 @@ class HistoryViewerContainer extends HookConsumerWidget {
 
     useEffect(() {
       if (initializer != null) {
-        initializer!(visible);
+        initializer!(
+          visible,
+          maxIndex: lines.length,
+        );
       }
       return null;
     });

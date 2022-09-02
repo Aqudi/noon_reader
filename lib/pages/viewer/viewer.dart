@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/hooks/use_item_positions_listener.dart';
 import 'package:noon_reader/hooks/use_item_scroll_controller.dart';
+import 'package:noon_reader/models/history.dart';
 import 'package:noon_reader/pages/viewer/viewer_viewmodel.dart';
 import 'package:noon_reader/pages/viewer/widgets/history_viewer_container.dart';
 import 'package:noon_reader/widgets/loading_indicator.dart';
@@ -26,29 +27,23 @@ class ViewerPage extends HookConsumerWidget {
     final fileIdentifier = kIsWeb ? file?.name : file?.path;
 
     // ViewerContainer 초기화 후 실행해야하는 함수
-    final initializer = useCallback((ValueNotifier<bool> visible) {
+    final historyCallback = useCallback((
+      ValueNotifier<bool> visible, {
+      required int maxIndex,
+    }) {
       // 이전 기록 가져오기
-      final initialIndex = viewerViewModel.getHistory(fileIdentifier);
+      final history = viewerViewModel.getHistory(fileIdentifier);
 
       // 기록된 index로 이동
       Future.microtask(
-        () => itemScrollController.jumpTo(index: initialIndex),
+        () => itemScrollController.jumpTo(index: history.index ?? 0),
       ).then((value) {
         // 초기화 완료
         visible.value = true;
-
-        // 스크롤 모니터링 -> 기록
-        itemPositionsListener.itemPositions.addListener(() async {
-          final newIndex =
-              itemPositionsListener.itemPositions.value.first.index;
-          if (newIndex != 0) {
-            await viewerViewModel.saveHistory(fileIdentifier, newIndex);
-          }
-        });
       });
-
-      return null;
     }, []);
+
+    final itremPositionCallback = useCallback(() {}, []);
 
     return Scaffold(
       appBar: const NoonAppBar(),

@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:noon_reader/models/history.dart';
 
 import 'package:noon_reader/models/setting.dart';
 import 'package:noon_reader/services/setting.dart';
@@ -31,17 +32,19 @@ class ViewerViewModel with ChangeNotifier {
     return null;
   }
 
-  int getHistory(String? filePath) {
-    int index = 0;
+  History getHistory(String? filePath) {
+    late History index;
     if (filePath != null) {
-      index = _storageService.get(BoxName.history, filePath)?["index"] ?? 0;
+      final history = _storageService.get(BoxName.history, filePath) ?? {};
+      print(history);
+      index = History();
     }
-    return index;
+    return History();
   }
 
-  Future<void> saveHistory(String? filePath, int index) async {
+  Future<void> saveHistory(String? filePath, History history) async {
     if (filePath != null) {
-      await _storageService.put(BoxName.history, filePath, {"index": index});
+      await _storageService.put(BoxName.history, filePath, history.toJson());
     }
   }
 }
