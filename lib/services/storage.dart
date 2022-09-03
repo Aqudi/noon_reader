@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_charset_detector/flutter_charset_detector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -47,7 +48,9 @@ class StorageService {
   Future<String?> readFileAsString(PlatformFile file) async {
     _logger.d("Read file name: ${file.name}");
     if (file.bytes != null) {
-      return utf8Decoder.convert(file.bytes!);
+      final result = await CharsetDetector.autoDecode(file.bytes!);
+      _logger.d("charset: ${result.charset}");
+      return result.string;
     }
     return null;
   }
