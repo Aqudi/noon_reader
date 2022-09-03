@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/hooks/use_item_positions_listener.dart';
 import 'package:noon_reader/hooks/use_item_scroll_controller.dart';
+import 'package:noon_reader/models/history.dart';
 import 'package:noon_reader/pages/viewer/viewer_viewmodel.dart';
 import 'package:noon_reader/pages/viewer/widgets/history_viewer_container.dart';
 import 'package:noon_reader/widgets/loading_indicator.dart';
@@ -23,31 +24,54 @@ class ViewerPage extends HookConsumerWidget {
     final itemScrollController = useItemScrollController();
     final itemPositionsListener = useItemPositionsListener();
 
-    final fileIdentifier = kIsWeb ? file?.name : file?.path;
+    final fileIdentifier = useMemoized(() => kIsWeb ? file?.name : file?.path);
 
-    // ViewerContainer 초기화 후 실행해야하는 함수
-    final initializer = useCallback((ValueNotifier<bool> visible) {
-      // 이전 기록 가져오기
-      final initialIndex = viewerViewModel.getHistory(fileIdentifier);
+    final buildHistoryViewerContainer = useCallback((String? content) {
+      return HookBuilder(
+        builder: (context) {
+          final lines = useMemoized(() => content?.split("\n"));
 
-      // 기록된 index로 이동
-      Future.microtask(
-        () => itemScrollController.jumpTo(index: initialIndex),
-      ).then((value) {
-        // 초기화 완료
-        visible.value = true;
+          // Fetch last index and jump to last index
+          final historyCallback = useCallback(() {
+            final history = viewerViewModel.getHistory(fileIdentifier);
+            return Future.microtask(
+              () => itemScrollController.jumpTo(index: history.index ?? 0),
+            );
+          }, []);
 
-        // 스크롤 모니터링 -> 기록
-        itemPositionsListener.itemPositions.addListener(() async {
-          final newIndex =
-              itemPositionsListener.itemPositions.value.first.index;
-          if (newIndex != 0) {
-            await viewerViewModel.saveHistory(fileIdentifier, newIndex);
-          }
-        });
-      });
+          // Record current index
+          final itemPositionCallback = useCallback(() {
+            final identifier = kIsWeb ? file?.name : file?.path;
+            saveHistory() async {
+              final newIndex =
+                  itemPositionsListener.itemPositions.value.first.index;
+              if (newIndex != 0) {
+                final newHistory = History(
+                  index: newIndex,
+                  maxIndex: lines?.length,
+                  path: identifier,
+                  timestamp: DateTime.now().millisecondsSinceEpoch,
+                );
+                viewerViewModel.saveHistory(fileIdentifier, newHistory);
+              }
+            }
 
-      return null;
+            itemPositionsListener.itemPositions.addListener(saveHistory);
+            return Future.microtask(() => saveHistory());
+          }, []);
+
+          return HistoryViewerContainer(
+            initializer: () async {
+              await historyCallback();
+              await itemPositionCallback();
+            },
+            content: lines ?? [],
+            setting: viewerViewModel.setting,
+            itemScrollController: itemScrollController,
+            itemPositionsListener: itemPositionsListener,
+          );
+        },
+      );
     }, []);
 
     return Scaffold(
@@ -58,13 +82,7 @@ class ViewerPage extends HookConsumerWidget {
           Widget widget = const LoadingIndicator();
 
           if (snapshot.hasData) {
-            widget = HistoryViewerContainer(
-              initializer: initializer,
-              content: snapshot.data,
-              setting: viewerViewModel.setting,
-              itemScrollController: itemScrollController,
-              itemPositionsListener: itemPositionsListener,
-            );
+            widget = buildHistoryViewerContainer(snapshot.data);
           }
 
           if (snapshot.hasError) {
