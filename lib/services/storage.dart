@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +33,6 @@ class StorageService {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['txt'],
-        withData: true,
       );
       if (result != null) {
         return result.files.single;
@@ -45,10 +45,12 @@ class StorageService {
     return null;
   }
 
-  Future<String?> readFileAsString(PlatformFile file) async {
-    _logger.d("Read file name: ${file.name}");
-    if (file.bytes != null) {
-      final result = await CharsetDetector.autoDecode(file.bytes!);
+  Future<String?> readFileAsString(String? filePath) async {
+    _logger.d("Read file name: $filePath");
+    if (filePath != null) {
+      final file = File(filePath);
+      final bytes = await file.readAsBytes();
+      final result = await CharsetDetector.autoDecode(bytes);
       _logger.d("charset: ${result.charset}");
       return result.string;
     }

@@ -1,5 +1,3 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,9 +11,9 @@ import 'package:noon_reader/widgets/loading_indicator.dart';
 import 'package:noon_reader/widgets/noon_app_bar.dart';
 
 class ViewerPage extends HookConsumerWidget {
-  final PlatformFile? file;
+  final String? filePath;
 
-  const ViewerPage({Key? key, required this.file}) : super(key: key);
+  const ViewerPage({Key? key, required this.filePath}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +22,7 @@ class ViewerPage extends HookConsumerWidget {
     final itemScrollController = useItemScrollController();
     final itemPositionsListener = useItemPositionsListener();
 
-    final fileIdentifier = useMemoized(() => kIsWeb ? file?.name : file?.path);
+    final fileIdentifier = useMemoized(() => filePath?.split("/").last);
 
     final buildHistoryViewerContainer = useCallback((String? content) {
       return HookBuilder(
@@ -41,7 +39,6 @@ class ViewerPage extends HookConsumerWidget {
 
           // Record current index
           final itemPositionCallback = useCallback(() {
-            final identifier = kIsWeb ? file?.name : file?.path;
             saveHistory() async {
               final newIndex =
                   itemPositionsListener.itemPositions.value.first.index;
@@ -49,7 +46,7 @@ class ViewerPage extends HookConsumerWidget {
                 final newHistory = History(
                   index: newIndex,
                   maxIndex: lines?.length,
-                  path: identifier,
+                  path: fileIdentifier,
                   timestamp: DateTime.now().millisecondsSinceEpoch,
                 );
                 viewerViewModel.saveHistory(fileIdentifier, newHistory);
@@ -77,7 +74,7 @@ class ViewerPage extends HookConsumerWidget {
     return Scaffold(
       appBar: const NoonAppBar(),
       body: FutureBuilder<String?>(
-        future: viewerViewModel.readFileAsString(file),
+        future: viewerViewModel.readFileAsString(filePath),
         builder: (context, snapshot) {
           Widget widget = const LoadingIndicator();
 

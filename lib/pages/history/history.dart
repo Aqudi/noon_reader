@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/models/history.dart';
 import 'package:noon_reader/pages/history/history_viewmodel.dart';
+import 'package:noon_reader/pages/viewer/viewer.dart';
 
 class HistoryPage extends HookConsumerWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -15,12 +16,6 @@ class HistoryPage extends HookConsumerWidget {
     useEffect(
       () {
         histories.value = historyViewModel.getAllHistory();
-        histories.value = [
-          ...histories.value,
-          ...histories.value,
-          ...histories.value,
-          ...histories.value,
-        ];
         return null;
       },
     );
@@ -28,7 +23,6 @@ class HistoryPage extends HookConsumerWidget {
     return ListView.builder(
       itemExtent: 80,
       itemCount: histories.value.length,
-      shrinkWrap: true,
       itemBuilder: (context, index) {
         final history = histories.value[index];
         final filename = history.path?.split("/").last ?? "";
@@ -41,7 +35,12 @@ class HistoryPage extends HookConsumerWidget {
 
           widget = ListTile(
             onTap: () {
-              
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewerPage(filePath: history.path),
+                ),
+              );
             },
             minLeadingWidth: 0,
             title: Column(

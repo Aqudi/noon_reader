@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,9 +29,9 @@ class ViewerViewModel with ChangeNotifier {
 
   Setting get setting => _settingService.setting;
 
-  Future<String?> readFileAsString(PlatformFile? file) async {
-    if (file != null) {
-      return _storageService.readFileAsString(file);
+  Future<String?> readFileAsString(String? filePath) async {
+    if (filePath != null) {
+      return _storageService.readFileAsString(filePath);
     }
     return null;
   }
