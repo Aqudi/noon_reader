@@ -109,7 +109,6 @@ class HistoryViewerContainer extends HookConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SettingPage(),
-                      fullscreenDialog: true,
                     ),
                   );
                 },

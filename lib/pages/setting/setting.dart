@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/pages/setting/widgets/option_modal.dart';
@@ -115,6 +116,50 @@ class SettingPage extends HookConsumerWidget {
       SettingViewModel settingViewModel, BuildContext context) {
     final setting = settingViewModel.setting;
 
+    buildColorBox(Color color) {
+      return Container(
+        width: 100,
+        color: color,
+        child: const Text(" "),
+      );
+    }
+
+    Widget showColorPicker(Color color) {
+      return HookConsumer(builder: (context, ref, widget) {
+        final newColor = useState(color);
+        final textController = useTextEditingController();
+
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: newColor.value,
+              onColorChanged: (value) {
+                newColor.value = value;
+              },
+              hexInputController: textController,
+              colorPickerWidth: 300,
+              pickerAreaHeightPercent: 0.7,
+              displayThumbColor: true,
+              paletteType: PaletteType.hsvWithHue,
+              pickerAreaBorderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(2),
+                topRight: Radius.circular(2),
+              ),
+              portraitOnly: true,
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('save'),
+              onPressed: () {
+                Navigator.of(context).pop(newColor.value);
+              },
+            ),
+          ],
+        );
+      });
+    }
+
     return _buildSettingList(
       sections: [
         SettingsSection(
@@ -140,39 +185,32 @@ class SettingPage extends HookConsumerWidget {
             ),
             SettingsTile(
               title: const Text('Font color'),
-              description: Text(setting.fontColor.toReadableName()),
+              trailing: buildColorBox(setting.fontColor),
               leading: const Icon(Icons.palette_outlined),
-              onPressed: settingViewModel.fontColorOnPressed,
+              onPressed: (context) async {
+                final newColor = await showDialog<Color?>(
+                  context: context,
+                  builder: (context) => showColorPicker(setting.fontColor),
+                );
+                if (newColor != null) {
+                  settingViewModel.updateFontColor(newColor);
+                }
+              },
             ),
             SettingsTile(
               title: const Text('Background color'),
-              description: Text(setting.backgroundColor.toReadableName()),
+              trailing: buildColorBox(setting.backgroundColor),
               leading: const Icon(Icons.format_paint_outlined),
-              onPressed: (context) => settingViewModel.backgroundColorOnPressed(
-                () async => showFloatingModalBottomSheet<Color?>(
+              onPressed: (context) async {
+                final newColor = await showDialog<Color?>(
                   context: context,
-                  builder: (context) => OptionModal(
-                      title: 'Background color',
-                      options: const [
-                        Colors.black,
-                        Colors.white,
-                        Colors.red,
-                        Colors.blue,
-                        Colors.green,
-                        Colors.yellow
-                      ],
-                      builder: (value) => Row(
-                            children: [
-                              Container(
-                                color: Color(value.value),
-                                padding: const EdgeInsets.all(10),
-                                margin: const EdgeInsets.only(right: 16),
-                              ),
-                              Text(Color(value.value).toReadableName()),
-                            ],
-                          )),
-                ),
-              ),
+                  builder: (context) =>
+                      showColorPicker(setting.backgroundColor),
+                );
+                if (newColor != null) {
+                  settingViewModel.updateBackgroundColor(newColor);
+                }
+              },
             ),
             SettingsTile(
               title: const Text('Padding'),

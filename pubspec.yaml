@@ -27,6 +27,7 @@ dependencies:
   dartz: ^0.10.1
   flutter_charset_detector: ^1.0.2
   easy_debounce: ^2.0.2+1
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   flutter_lints: ^2.0.1

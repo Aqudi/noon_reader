@@ -9,7 +9,7 @@ import 'package:noon_reader/pages/viewer/viewer_viewmodel.dart';
 import 'package:noon_reader/pages/viewer/widgets/history_viewer_container.dart';
 import 'package:noon_reader/widgets/loading_indicator.dart';
 
-import 'package:noon_reader/widgets/noon_app_bar.dart';
+// import 'package:noon_reader/widgets/noon_app_bar.dart';
 
 class ViewerPage extends HookConsumerWidget {
   final String? filePath;
@@ -78,23 +78,25 @@ class ViewerPage extends HookConsumerWidget {
       );
     }, []);
 
-    return Scaffold(
-      appBar: const NoonAppBar(),
-      body: FutureBuilder<String?>(
-        future: viewerViewModel.readFileAsString(filePath),
-        builder: (context, snapshot) {
-          Widget widget = const LoadingIndicator();
+    return SafeArea(
+      child: Scaffold(
+        // appBar: const NoonAppBar(),
+        body: FutureBuilder<String?>(
+          future: viewerViewModel.readFileAsString(filePath),
+          builder: (context, snapshot) {
+            Widget widget = const LoadingIndicator();
 
-          if (snapshot.hasData) {
-            widget = buildHistoryViewerContainer(snapshot.data);
-          }
+            if (snapshot.hasData) {
+              widget = buildHistoryViewerContainer(snapshot.data);
+            }
 
-          if (snapshot.hasError) {
-            widget = Center(child: Text("에러 ${snapshot.error}"));
-          }
+            if (snapshot.hasError) {
+              widget = Center(child: Text("에러 ${snapshot.error}"));
+            }
 
-          return widget;
-        },
+            return widget;
+          },
+        ),
       ),
     );
   }
