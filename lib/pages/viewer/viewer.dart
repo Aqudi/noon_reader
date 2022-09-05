@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/hooks/use_item_positions_listener.dart';
 import 'package:noon_reader/hooks/use_item_scroll_controller.dart';
@@ -22,7 +23,7 @@ class ViewerPage extends HookConsumerWidget {
     final itemScrollController = useItemScrollController();
     final itemPositionsListener = useItemPositionsListener();
 
-    final fileIdentifier = useMemoized(() => filePath?.split("/").last);
+    final filename = useMemoized(() => filePath?.split("/").last);
 
     final buildHistoryViewerContainer = useCallback((String? content) {
       return HookBuilder(
@@ -31,7 +32,7 @@ class ViewerPage extends HookConsumerWidget {
 
           // Fetch last index and jump to last index
           final historyCallback = useCallback(() {
-            final history = viewerViewModel.getHistory(fileIdentifier);
+            final history = viewerViewModel.getHistory(filename);
             return Future.microtask(
               () => itemScrollController.jumpTo(index: history.index ?? 0),
             );
@@ -46,14 +47,20 @@ class ViewerPage extends HookConsumerWidget {
                 final newHistory = History(
                   index: newIndex,
                   maxIndex: lines?.length,
-                  path: fileIdentifier,
+                  path: filePath,
                   timestamp: DateTime.now().millisecondsSinceEpoch,
                 );
-                viewerViewModel.saveHistory(fileIdentifier, newHistory);
+                viewerViewModel.saveHistory(filename, newHistory);
               }
             }
 
-            itemPositionsListener.itemPositions.addListener(saveHistory);
+            itemPositionsListener.itemPositions.addListener(() {
+              EasyDebounce.debounce(
+                'itemPositionsListener',
+                const Duration(milliseconds: 100),
+                () => saveHistory(),
+              );
+            });
             return Future.microtask(() => saveHistory());
           }, []);
 
