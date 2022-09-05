@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/models/setting.dart';
+import 'package:noon_reader/pages/setting/setting.dart';
 import 'package:noon_reader/widgets/viewer_container.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -33,6 +34,9 @@ class HistoryViewerContainer extends HookConsumerWidget {
     // Text가 초기화 및 initialIndex로 이동 후 보이도록 제어
     final visible = useState(false);
 
+    final textStyle =
+        Theme.of(context).textTheme.bodyText1 ?? const TextStyle();
+
     // 컨트롤러 연결
     useEffect(() {
       if (initializer != null) {
@@ -46,7 +50,7 @@ class HistoryViewerContainer extends HookConsumerWidget {
         Container(
           color: setting?.backgroundColor,
           child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodyText1 ?? const TextStyle(),
+            style: textStyle,
             child: Column(
               children: [
                 Expanded(
@@ -78,8 +82,8 @@ class HistoryViewerContainer extends HookConsumerWidget {
                       return null;
                     });
 
-                    return Container(
-                      color: Colors.green,
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
                       child: Text("${currentIndex.value}/${content.length}"),
                     );
                   },
@@ -89,9 +93,33 @@ class HistoryViewerContainer extends HookConsumerWidget {
           ),
         ),
         Positioned(
-          bottom: 10,
-          left: 10,
-          child: FloatingActionButton(onPressed: () {}),
+          bottom: 15,
+          right: 15,
+          child: SizedBox(
+            width: 45,
+            height: 45,
+            child: Opacity(
+              opacity: 0.5,
+              child: FloatingActionButton(
+                tooltip: "menu",
+                focusColor: Colors.black,
+                backgroundColor: Colors.black,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingPage(),
+                      fullscreenDialog: true,
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.menu,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

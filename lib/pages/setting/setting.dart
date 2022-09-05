@@ -18,14 +18,16 @@ class SettingPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingViewModel = ref.watch(settingViewModelProvider);
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildCommonSection(settingViewModel, context),
-          ..._buildViewerPreviewSection(settingViewModel, context),
-          _buildViewerSection(settingViewModel, context),
-          _buildMiscSection(context),
-        ],
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildCommonSection(settingViewModel, context),
+            ..._buildViewerPreviewSection(settingViewModel, context),
+            _buildViewerSection(settingViewModel, context),
+            _buildMiscSection(context),
+          ],
+        ),
       ),
     );
   }
