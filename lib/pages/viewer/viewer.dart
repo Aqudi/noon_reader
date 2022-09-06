@@ -91,7 +91,7 @@ class ViewerPage extends HookConsumerWidget {
             }
 
             if (snapshot.hasError) {
-              widget = Center(child: Text("에러 ${snapshot.error}"));
+              widget = Center(child: Text("${snapshot.error}"));
             }
 
             return widget;

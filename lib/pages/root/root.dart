@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -6,6 +7,7 @@ import 'package:noon_reader/pages/history/history.dart';
 import 'package:noon_reader/pages/setting/setting.dart';
 import 'package:noon_reader/widgets/noon_app_bar.dart';
 
+import '../../generated/locale_keys.g.dart';
 import 'root_viewmodel.dart';
 
 class RootPage extends HookConsumerWidget {
@@ -20,7 +22,7 @@ class RootPage extends HookConsumerWidget {
       case 2:
         return const SettingPage();
       default:
-        return const Center(child: Text('404 Page not found'));
+        return Center(child: const Text('404 Page not found').tr());
     }
   }
 
@@ -38,18 +40,18 @@ class RootPage extends HookConsumerWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: rootViewModel.setSelectedIndex,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: const Icon(Icons.history),
+            label: LocaleKeys.history_label.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Explorer',
+            icon: const Icon(Icons.search),
+            label: LocaleKeys.explorer_label.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Setting',
+            icon: const Icon(Icons.settings),
+            label: LocaleKeys.setting_label.tr(),
           ),
         ],
       ),

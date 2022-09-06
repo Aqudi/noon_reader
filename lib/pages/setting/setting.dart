@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,6 +11,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:noon_reader/widgets/viewer_container.dart';
 import 'package:noon_reader/utils/extensions.dart';
 
+import '../../generated/locale_keys.g.dart';
 import 'setting_viewmodel.dart';
 
 class SettingPage extends HookConsumerWidget {
@@ -48,16 +50,16 @@ class SettingPage extends HookConsumerWidget {
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: const Text('Common'),
+          title: const Text(LocaleKeys.setting_common_section).tr(),
           tiles: [
             SettingsTile(
-              title: const Text('Language'),
+              title: const Text(LocaleKeys.setting_language).tr(),
               description: Text(setting.language),
               leading: const Icon(Icons.language),
               onPressed: settingViewModel.languageOnPressed,
             ),
             SettingsTile.switchTile(
-              title: const Text('Dark mode'),
+              title: const Text(LocaleKeys.setting_darkMode).tr(),
               leading: const Icon(Icons.dark_mode),
               onToggle: settingViewModel.darkModeOnToggle,
               initialValue: setting.darkMode,
@@ -73,9 +75,9 @@ class SettingPage extends HookConsumerWidget {
     return [
       _buildSettingList(
         sections: [
-          const SettingsSection(
-            title: Text('Viewer preview'),
-            tiles: [],
+          SettingsSection(
+            title: const Text(LocaleKeys.setting_viewer_preview_section).tr(),
+            tiles: const [],
           ),
         ],
       ),
@@ -96,7 +98,7 @@ class SettingPage extends HookConsumerWidget {
               }
 
               if (snapshot.hasError) {
-                content = "알 수 없는 오류";
+                content = LocaleKeys.error_unknown.tr();
               }
 
               widget = ViewerContainer(
@@ -150,7 +152,7 @@ class SettingPage extends HookConsumerWidget {
           ),
           actions: <Widget>[
             ElevatedButton(
-              child: const Text('save'),
+              child: const Text(LocaleKeys.save).tr(),
               onPressed: () {
                 Navigator.of(context).pop(newColor.value);
               },
@@ -163,28 +165,28 @@ class SettingPage extends HookConsumerWidget {
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: const Text('Viewer'),
+          title: const Text(LocaleKeys.setting_viewer_section).tr(),
           tiles: [
             SettingsTile(
-              title: const Text('Font family'),
+              title: const Text(LocaleKeys.setting_fontFamily).tr(),
               description: Text(setting.fontFamily),
               leading: const Icon(Icons.text_format),
               onPressed: settingViewModel.fontFamilyOnPressed,
             ),
             SettingsTile(
-              title: const Text('Font size'),
+              title: const Text(LocaleKeys.setting_fontSize).tr(),
               description: Text('${setting.fontSize}'),
               leading: const Icon(Icons.format_size),
               onPressed: settingViewModel.fontSizeOnPressed,
             ),
             SettingsTile(
-              title: const Text('Font weight'),
+              title: const Text(LocaleKeys.setting_fontWeight).tr(),
               description: Text(setting.fontWeight.toReadableName()),
               leading: const Icon(Icons.format_bold),
               onPressed: settingViewModel.fontWeightOnPressed,
             ),
             SettingsTile(
-              title: const Text('Font color'),
+              title: const Text(LocaleKeys.setting_fontColor).tr(),
               trailing: buildColorBox(setting.fontColor),
               leading: const Icon(Icons.palette_outlined),
               onPressed: (context) async {
@@ -198,7 +200,7 @@ class SettingPage extends HookConsumerWidget {
               },
             ),
             SettingsTile(
-              title: const Text('Background color'),
+              title: const Text(LocaleKeys.setting_backgroundColor).tr(),
               trailing: buildColorBox(setting.backgroundColor),
               leading: const Icon(Icons.format_paint_outlined),
               onPressed: (context) async {
@@ -213,14 +215,14 @@ class SettingPage extends HookConsumerWidget {
               },
             ),
             SettingsTile(
-              title: const Text('Padding'),
+              title: const Text(LocaleKeys.setting_padding).tr(),
               description: Text(setting.padding.toReadable()),
               leading: const Icon(Icons.padding_outlined),
               onPressed: (context) => settingViewModel.paddingOnPressed(
                 () async => showFloatingModalBottomSheet<double?>(
                   context: context,
                   builder: (context) => OptionModal(
-                    title: 'Padding',
+                    title: LocaleKeys.setting_padding.tr(),
                     options: List.generate(30, (index) => index),
                   ),
                 ),
@@ -236,14 +238,14 @@ class SettingPage extends HookConsumerWidget {
     return _buildSettingList(
       sections: [
         SettingsSection(
-          title: const Text('Misc'),
+          title: const Text(LocaleKeys.setting_misc_section).tr(),
           tiles: [
             SettingsTile(
-              title: const Text('Terms of Service'),
+              title: const Text(LocaleKeys.setting_termisOfService).tr(),
               leading: const Icon(Icons.description),
             ),
             SettingsTile(
-              title: const Text('Open source licenses'),
+              title: const Text(LocaleKeys.setting_openSourceLicenses).tr(),
               leading: const Icon(Icons.collections_bookmark),
             ),
           ],
