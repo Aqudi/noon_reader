@@ -1,7 +1,7 @@
 {
     "language": {
         "en": "English",
-        "ko": "Korean"
+        "ko": "한국어"
     },
     "explorer": {
         "label": "Explorer",
@@ -34,5 +34,9 @@
     "viewer": {
         "menuTooltip": "menu"
     },
-    "save": "save"
+    "save": "save",
+    "left": "left",
+    "top": "top",
+    "right": "right",
+    "bottom": "bottom"
 }

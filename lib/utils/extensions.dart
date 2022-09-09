@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 
 extension FontWeightReadable on FontWeight {
@@ -26,8 +28,18 @@ extension ColorReadable on Color {
   }
 }
 
-extension EdgeInsetsReadable on EdgeInsets {
+extension EdgeInsetsExtensions on EdgeInsets {
   String toReadable() {
     return 'left: $left, right: $right, top: $top, bottom: $bottom';
+  }
+
+  List<double> toLTRB() {
+    return [left, top, right, bottom];
+  }
+}
+
+extension DoubleExtensions on double {
+  double roundAsFixed(int decimalPlaces) {
+    return (this * pow(10, decimalPlaces)).round() / pow(10, decimalPlaces);
   }
 }

@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:noon_reader/constants/app.dart';
 import 'package:noon_reader/pages/setting/widgets/option_modal.dart';
 import 'package:noon_reader/widgets/floating_modal.dart';
 import 'package:noon_reader/widgets/loading_indicator.dart';
@@ -54,14 +56,28 @@ class SettingPage extends HookConsumerWidget {
           tiles: [
             SettingsTile(
               title: const Text(LocaleKeys.setting_language).tr(),
-              description: Text(setting.language),
+              description:
+                  Text("${LocaleKeys.language}.${setting.languageCode}").tr(),
               leading: const Icon(Icons.language),
-              onPressed: settingViewModel.languageOnPressed,
+              onPressed: (context) async => settingViewModel.updateLanguage(
+                context,
+                await showFloatingModalBottomSheet(
+                  context: context,
+                  builder: (context) => OptionModal(
+                    title: 'Language',
+                    builder: (code) =>
+                        Text("${LocaleKeys.language}.$code").tr(),
+                    options: context.supportedLocales
+                        .map((locale) => locale.languageCode)
+                        .toList(),
+                  ),
+                ),
+              ),
             ),
             SettingsTile.switchTile(
               title: const Text(LocaleKeys.setting_darkMode).tr(),
               leading: const Icon(Icons.dark_mode),
-              onToggle: settingViewModel.darkModeOnToggle,
+              onToggle: settingViewModel.toggleDarkMode,
               initialValue: setting.darkMode,
             ),
           ],
@@ -171,59 +187,146 @@ class SettingPage extends HookConsumerWidget {
               title: const Text(LocaleKeys.setting_fontFamily).tr(),
               description: Text(setting.fontFamily),
               leading: const Icon(Icons.text_format),
-              onPressed: settingViewModel.fontFamilyOnPressed,
+              onPressed: (context) async => settingViewModel.updateFontFamily(
+                await showFloatingModalBottomSheet(
+                  context: context,
+                  builder: (context) => OptionModal(
+                    title: 'Font family',
+                    options: AppConstants.fontFamilies,
+                    builder: (dynamic fontFamily) => Text(
+                      '$fontFamily',
+                      style: GoogleFonts.getFont(fontFamily,
+                          textStyle: Theme.of(context).textTheme.bodyText2),
+                    ),
+                  ),
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text(LocaleKeys.setting_fontSize).tr(),
               description: Text('${setting.fontSize}'),
               leading: const Icon(Icons.format_size),
-              onPressed: settingViewModel.fontSizeOnPressed,
+              onPressed: (context) async => settingViewModel.updateFontSize(
+                await showFloatingModalBottomSheet(
+                  context: context,
+                  builder: (context) => HookConsumer(
+                    builder: (context, ref, widget) {
+                      final settingViewModel =
+                          ref.watch(settingViewModelProvider);
+                      final fontSize = settingViewModel.setting.fontSize;
+                      return ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Slider(
+                            value: fontSize,
+                            min: 1,
+                            max: 100,
+                            label: fontSize.toInt().toString(),
+                            onChanged: (value) {
+                              settingViewModel.updateFontSize(value.toInt());
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text(LocaleKeys.setting_fontWeight).tr(),
               description: Text(setting.fontWeight.toReadableName()),
               leading: const Icon(Icons.format_bold),
-              onPressed: settingViewModel.fontWeightOnPressed,
+              onPressed: (context) async => settingViewModel.updateFontWeight(
+                await showFloatingModalBottomSheet(
+                  context: context,
+                  builder: (context) => OptionModal(
+                    title: LocaleKeys.setting_fontWeight.tr(),
+                    options: FontWeightReadable.names,
+                  ),
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text(LocaleKeys.setting_fontColor).tr(),
               trailing: buildColorBox(setting.fontColor),
               leading: const Icon(Icons.palette_outlined),
-              onPressed: (context) async {
-                final newColor = await showDialog<Color?>(
+              onPressed: (context) async => settingViewModel.updateFontColor(
+                await showDialog<Color?>(
                   context: context,
                   builder: (context) => showColorPicker(setting.fontColor),
-                );
-                if (newColor != null) {
-                  settingViewModel.updateFontColor(newColor);
-                }
-              },
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text(LocaleKeys.setting_backgroundColor).tr(),
               trailing: buildColorBox(setting.backgroundColor),
               leading: const Icon(Icons.format_paint_outlined),
-              onPressed: (context) async {
-                final newColor = await showDialog<Color?>(
+              onPressed: (context) async =>
+                  settingViewModel.updateBackgroundColor(
+                await showDialog<Color?>(
                   context: context,
                   builder: (context) =>
                       showColorPicker(setting.backgroundColor),
-                );
-                if (newColor != null) {
-                  settingViewModel.updateBackgroundColor(newColor);
-                }
-              },
+                ),
+              ),
             ),
             SettingsTile(
               title: const Text(LocaleKeys.setting_padding).tr(),
-              description: Text(setting.padding.toReadable()),
+              description: Text(setting.padding
+                  .toReadable()
+                  .split(", ")
+                  .map((e) => e.tr())
+                  .join("\n")),
               leading: const Icon(Icons.padding_outlined),
-              onPressed: (context) => settingViewModel.paddingOnPressed(
-                () async => showFloatingModalBottomSheet<double?>(
+              onPressed: (context) async => settingViewModel.updatePadding(
+                await showFloatingModalBottomSheet(
                   context: context,
-                  builder: (context) => OptionModal(
-                    title: LocaleKeys.setting_padding.tr(),
-                    options: List.generate(30, (index) => index),
+                  builder: (context) => HookConsumer(
+                    builder: (context, ref, widget) {
+                      final settingViewModel =
+                          ref.watch(settingViewModelProvider);
+                      final padding = settingViewModel.setting.padding
+                          .toLTRB()
+                          .map((e) => e.roundAsFixed(2))
+                          .toList();
+                      final labelKeys = ["left", "top", "right", "bottom"];
+                      final labels =
+                          labelKeys.map((e) => e.tr().padLeft(6, " ")).toList();
+
+                      return ListView(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        shrinkWrap: true,
+                        children: [
+                          for (var i = 0; i < padding.length; i++)
+                            Row(
+                              children: [
+                                Text(labels[i]),
+                                Expanded(
+                                  child: Slider(
+                                    value: padding[i],
+                                    min: 0,
+                                    max: 100,
+                                    label: padding[i].toString(),
+                                    onChanged: (value) {
+                                      padding[i] = value.roundAsFixed(2);
+                                      settingViewModel.updatePadding(
+                                        EdgeInsets.fromLTRB(
+                                          padding[0],
+                                          padding[1],
+                                          padding[2],
+                                          padding[3],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Text(padding[i].toString().padRight(6, " ")),
+                              ],
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),

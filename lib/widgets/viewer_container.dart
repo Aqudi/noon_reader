@@ -41,25 +41,23 @@ class ViewerContainer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      color: setting?.backgroundColor,
-      child: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyText1 ?? const TextStyle(),
+    final textStyle = Theme.of(context).textTheme.bodyText1;
+    print(textStyle?.fontFamily);
+    return DefaultTextStyle(
+      style: const TextStyle().merge(textStyle),
+      child: Container(
+        padding: setting?.padding,
+        color: setting?.backgroundColor,
         child: Opacity(
           opacity: opacity,
           child: ScrollablePositionedList.builder(
             key: key,
-            // 보이지 않을 때스크롤 방지
             physics: physics,
-            padding: setting?.padding,
             itemScrollController: itemScrollController,
             itemPositionsListener: itemPositionsListener,
             itemCount: lines.length,
             itemBuilder: (context, index) {
-              return CustomText(
-                index,
-                lines[index],
-              );
+              return CustomText(index, lines[index]);
             },
           ),
         ),

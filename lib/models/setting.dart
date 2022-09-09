@@ -10,7 +10,7 @@ part 'setting.g.dart';
 class Setting with _$Setting {
   factory Setting({
     required bool darkMode,
-    required String language,
+    String? languageCode,
     required String fontFamily,
     required double fontSize,
     @JsonKey(name: 'fontWeight')

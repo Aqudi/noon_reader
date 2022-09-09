@@ -37,9 +37,6 @@ class HistoryViewerContainer extends HookConsumerWidget {
     // Text가 초기화 및 initialIndex로 이동 후 보이도록 제어
     final visible = useState(false);
 
-    final textStyle =
-        Theme.of(context).textTheme.bodyText1 ?? const TextStyle();
-
     // 컨트롤러 연결
     useEffect(() {
       if (initializer != null) {
@@ -52,47 +49,44 @@ class HistoryViewerContainer extends HookConsumerWidget {
       children: [
         Container(
           color: setting?.backgroundColor,
-          child: DefaultTextStyle(
-            style: textStyle,
-            child: Column(
-              children: [
-                Expanded(
-                  child: ViewerContainer(
-                    key: key,
-                    content: content,
-                    setting: setting,
-                    // 초기화 후 보이도록
-                    opacity: visible.value ? 1 : 0,
-                    // 초기화 후 스크롤 가능하도록
-                    physics: visible.value
-                        ? const ClampingScrollPhysics()
-                        : const NeverScrollableScrollPhysics(),
-                    itemScrollController: itemScrollController,
-                    itemPositionsListener: itemPositionsListener,
-                  ),
+          child: Column(
+            children: [
+              Expanded(
+                child: ViewerContainer(
+                  key: key,
+                  content: content,
+                  setting: setting,
+                  // 초기화 후 보이도록
+                  opacity: visible.value ? 1 : 0,
+                  // 초기화 후 스크롤 가능하도록
+                  physics: visible.value
+                      ? const ClampingScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  itemScrollController: itemScrollController,
+                  itemPositionsListener: itemPositionsListener,
                 ),
-                HookBuilder(
-                  builder: (context) {
-                    final currentIndex = useState(initialIndex);
-                    useEffect(() {
-                      itemPositionsListener?.itemPositions.addListener(() {
-                        final firstIndex = itemPositionsListener
-                            ?.itemPositions.value.first.index;
-                        if (firstIndex != null) {
-                          currentIndex.value = firstIndex;
-                        }
-                      });
-                      return null;
+              ),
+              HookBuilder(
+                builder: (context) {
+                  final currentIndex = useState(initialIndex);
+                  useEffect(() {
+                    itemPositionsListener?.itemPositions.addListener(() {
+                      final firstIndex = itemPositionsListener
+                          ?.itemPositions.value.first.index;
+                      if (firstIndex != null) {
+                        currentIndex.value = firstIndex;
+                      }
                     });
+                    return null;
+                  });
 
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Text("${currentIndex.value}/${content.length}"),
-                    );
-                  },
-                ),
-              ],
-            ),
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: Text("${currentIndex.value}/${content.length}"),
+                  );
+                },
+              ),
+            ],
           ),
         ),
         Positioned(

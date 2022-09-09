@@ -21,7 +21,7 @@ Setting _$SettingFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Setting {
   bool get darkMode => throw _privateConstructorUsedError;
-  String get language => throw _privateConstructorUsedError;
+  String? get languageCode => throw _privateConstructorUsedError;
   String get fontFamily => throw _privateConstructorUsedError;
   double get fontSize => throw _privateConstructorUsedError;
   @JsonKey(name: 'fontWeight')
@@ -48,7 +48,7 @@ abstract class $SettingCopyWith<$Res> {
       _$SettingCopyWithImpl<$Res>;
   $Res call(
       {bool darkMode,
-      String language,
+      String? languageCode,
       String fontFamily,
       double fontSize,
       @JsonKey(name: 'fontWeight')
@@ -76,7 +76,7 @@ class _$SettingCopyWithImpl<$Res> implements $SettingCopyWith<$Res> {
   @override
   $Res call({
     Object? darkMode = freezed,
-    Object? language = freezed,
+    Object? languageCode = freezed,
     Object? fontFamily = freezed,
     Object? fontSize = freezed,
     Object? fontWeight = freezed,
@@ -89,10 +89,10 @@ class _$SettingCopyWithImpl<$Res> implements $SettingCopyWith<$Res> {
           ? _value.darkMode
           : darkMode // ignore: cast_nullable_to_non_nullable
               as bool,
-      language: language == freezed
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
+      languageCode: languageCode == freezed
+          ? _value.languageCode
+          : languageCode // ignore: cast_nullable_to_non_nullable
+              as String?,
       fontFamily: fontFamily == freezed
           ? _value.fontFamily
           : fontFamily // ignore: cast_nullable_to_non_nullable
@@ -129,7 +129,7 @@ abstract class _$$_SettingCopyWith<$Res> implements $SettingCopyWith<$Res> {
   @override
   $Res call(
       {bool darkMode,
-      String language,
+      String? languageCode,
       String fontFamily,
       double fontSize,
       @JsonKey(name: 'fontWeight')
@@ -158,7 +158,7 @@ class __$$_SettingCopyWithImpl<$Res> extends _$SettingCopyWithImpl<$Res>
   @override
   $Res call({
     Object? darkMode = freezed,
-    Object? language = freezed,
+    Object? languageCode = freezed,
     Object? fontFamily = freezed,
     Object? fontSize = freezed,
     Object? fontWeight = freezed,
@@ -171,10 +171,10 @@ class __$$_SettingCopyWithImpl<$Res> extends _$SettingCopyWithImpl<$Res>
           ? _value.darkMode
           : darkMode // ignore: cast_nullable_to_non_nullable
               as bool,
-      language: language == freezed
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
+      languageCode: languageCode == freezed
+          ? _value.languageCode
+          : languageCode // ignore: cast_nullable_to_non_nullable
+              as String?,
       fontFamily: fontFamily == freezed
           ? _value.fontFamily
           : fontFamily // ignore: cast_nullable_to_non_nullable
@@ -208,7 +208,7 @@ class __$$_SettingCopyWithImpl<$Res> extends _$SettingCopyWithImpl<$Res>
 class _$_Setting implements _Setting {
   _$_Setting(
       {required this.darkMode,
-      required this.language,
+      this.languageCode,
       required this.fontFamily,
       required this.fontSize,
       @JsonKey(name: 'fontWeight')
@@ -230,7 +230,7 @@ class _$_Setting implements _Setting {
   @override
   final bool darkMode;
   @override
-  final String language;
+  final String? languageCode;
   @override
   final String fontFamily;
   @override
@@ -254,7 +254,7 @@ class _$_Setting implements _Setting {
 
   @override
   String toString() {
-    return 'Setting(darkMode: $darkMode, language: $language, fontFamily: $fontFamily, fontSize: $fontSize, fontWeight: $fontWeight, fontColor: $fontColor, backgroundColor: $backgroundColor, padding: $padding)';
+    return 'Setting(darkMode: $darkMode, languageCode: $languageCode, fontFamily: $fontFamily, fontSize: $fontSize, fontWeight: $fontWeight, fontColor: $fontColor, backgroundColor: $backgroundColor, padding: $padding)';
   }
 
   @override
@@ -263,7 +263,8 @@ class _$_Setting implements _Setting {
         (other.runtimeType == runtimeType &&
             other is _$_Setting &&
             const DeepCollectionEquality().equals(other.darkMode, darkMode) &&
-            const DeepCollectionEquality().equals(other.language, language) &&
+            const DeepCollectionEquality()
+                .equals(other.languageCode, languageCode) &&
             const DeepCollectionEquality()
                 .equals(other.fontFamily, fontFamily) &&
             const DeepCollectionEquality().equals(other.fontSize, fontSize) &&
@@ -280,7 +281,7 @@ class _$_Setting implements _Setting {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(darkMode),
-      const DeepCollectionEquality().hash(language),
+      const DeepCollectionEquality().hash(languageCode),
       const DeepCollectionEquality().hash(fontFamily),
       const DeepCollectionEquality().hash(fontSize),
       const DeepCollectionEquality().hash(fontWeight),
@@ -304,7 +305,7 @@ class _$_Setting implements _Setting {
 abstract class _Setting implements Setting {
   factory _Setting(
       {required final bool darkMode,
-      required final String language,
+      final String? languageCode,
       required final String fontFamily,
       required final double fontSize,
       @JsonKey(name: 'fontWeight')
@@ -325,7 +326,7 @@ abstract class _Setting implements Setting {
   @override
   bool get darkMode;
   @override
-  String get language;
+  String? get languageCode;
   @override
   String get fontFamily;
   @override

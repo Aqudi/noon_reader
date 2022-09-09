@@ -31,5 +31,9 @@ abstract class  LocaleKeys {
   static const viewer_menuTooltip = 'viewer.menuTooltip';
   static const viewer = 'viewer';
   static const save = 'save';
+  static const left = 'left';
+  static const top = 'top';
+  static const right = 'right';
+  static const bottom = 'bottom';
 
 }

@@ -4,9 +4,10 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "generate intl resources",
+            "label": "build_runner",
             "type": "shell",
-            "command": "flutter pub run easy_localization:generate --source-dir translations && flutter pub run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir translations"
+            "command": "flutter pub run build_runner build --delete-conflicting-outputs && flutter pub run easy_localization:generate --source-dir translations && flutter pub run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir translations",
+            "problemMatcher": []
         }
     ]
 }
