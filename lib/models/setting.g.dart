@@ -8,7 +8,7 @@ part of 'setting.dart';
 
 _$_Setting _$$_SettingFromJson(Map<String, dynamic> json) => _$_Setting(
       darkMode: json['darkMode'] as bool,
-      language: json['language'] as String,
+      languageCode: json['languageCode'] as String?,
       fontFamily: json['fontFamily'] as String,
       fontSize: (json['fontSize'] as num).toDouble(),
       fontWeight:
@@ -22,7 +22,7 @@ _$_Setting _$$_SettingFromJson(Map<String, dynamic> json) => _$_Setting(
 Map<String, dynamic> _$$_SettingToJson(_$_Setting instance) =>
     <String, dynamic>{
       'darkMode': instance.darkMode,
-      'language': instance.language,
+      'languageCode': instance.languageCode,
       'fontFamily': instance.fontFamily,
       'fontSize': instance.fontSize,
       'fontWeight': const FontWeightSerializer().toJson(instance.fontWeight),

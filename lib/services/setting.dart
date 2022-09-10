@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +19,6 @@ class SettingService extends ChangeNotifier {
   late Setting _setting;
   final Setting _defaultSetting = Setting(
     darkMode: true,
-    language: AppConstants.defaultLanguage,
     fontFamily: AppConstants.defaultFontFamily,
     fontSize: 14,
     fontWeight: FontWeight.normal,
@@ -33,6 +33,7 @@ class SettingService extends ChangeNotifier {
 
   Setting get setting => _setting;
   bool get isDefaultSetting => _setting == _defaultSetting;
+  bool get darkMode => setting.darkMode;
 
   Setting load() {
     final settingJson = _storageService.get(BoxName.setting, storageKey);
@@ -46,9 +47,16 @@ class SettingService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void update(Setting setting) {
+  void update(Setting setting, {bool save = true}) {
     _setting = setting;
-    save();
+    if (save) {
+      this.save();
+    }
+  }
+
+  Future<void> updateLocale(BuildContext context) async {
+    await EasyLocalization.of(context)
+        ?.setLocale(Locale(setting.languageCode ?? "en"));
   }
 
   TextTheme getTextTheme(BuildContext context) {

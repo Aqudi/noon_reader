@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/pages/viewer/viewer.dart';
 
+import '../../generated/locale_keys.g.dart';
 import 'explorer_viewmodel.dart';
 
 class ExplorerPage extends HookConsumerWidget {
@@ -24,7 +26,7 @@ class ExplorerPage extends HookConsumerWidget {
             ),
           );
         },
-        child: const Text('파일 열기'),
+        child: const Text(LocaleKeys.explorer_openFile).tr(),
       ),
     );
   }

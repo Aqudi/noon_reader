@@ -21,26 +21,20 @@ class OptionModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText1!,
-      child: Material(
-        child: SafeArea(
-          top: false,
-          child: ListView(
-            shrinkWrap: true,
-            controller: ModalScrollController.of(context),
-            physics: const ClampingScrollPhysics(),
-            children: ListTile.divideTiles(
-                context: context,
-                tiles: (options ?? List.empty()).map(
-                  (e) => ListTile(
-                    title: (builder ?? defaultBuilder)(e),
-                    onTap: () => Navigator.pop(context, e),
-                  ),
-                )).toList(),
-          ),
-        ),
-      ),
+    return ListView(
+      shrinkWrap: true,
+      controller: ModalScrollController.of(context),
+      physics: const ClampingScrollPhysics(),
+      children: ListTile.divideTiles(
+          context: context,
+          tiles: (options ?? List.empty()).map(
+            (e) {
+              return ListTile(
+                title: (builder ?? defaultBuilder)(e),
+                onTap: () => Navigator.pop(context, e),
+              );
+            },
+          )).toList(),
     );
   }
 }

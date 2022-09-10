@@ -1,0 +1,42 @@
+{
+    "language": {
+        "en": "English",
+        "ko": "한국어"
+    },
+    "explorer": {
+        "label": "Explorer",
+        "openFile": "Open file"
+    },
+    "error": {
+        "404": "404 Page not found",
+        "unknown": "Unknown error"
+    },
+    "history": {
+        "label": "History"
+    },
+    "setting": {
+        "label": "Setting",
+        "common_section": "Common",
+        "language": "Language",
+        "darkMode": "Dark mode",
+        "viewer_preview_section": "Viewer preview",
+        "viewer_section": "Viewer",
+        "fontFamily": "Font family",
+        "fontSize": "Font size",
+        "fontWeight": "Font weight",
+        "fontColor": "Font color",
+        "backgroundColor": "Background color",
+        "padding": "Padding",
+        "misc_section": "Misc",
+        "termisOfService": "Terms of service",
+        "openSourceLicenses": "Open source licenses"
+    },
+    "viewer": {
+        "menuTooltip": "menu"
+    },
+    "save": "save",
+    "left": "left",
+    "top": "top",
+    "right": "right",
+    "bottom": "bottom"
+}
