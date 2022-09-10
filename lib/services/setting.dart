@@ -47,15 +47,16 @@ class SettingService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void update(Setting setting) {
+  void update(Setting setting, {bool save = true}) {
     _setting = setting;
-    save();
+    if (save) {
+      this.save();
+    }
   }
 
   Future<void> updateLocale(BuildContext context) async {
     await EasyLocalization.of(context)
         ?.setLocale(Locale(setting.languageCode ?? "en"));
-    notifyListeners();
   }
 
   TextTheme getTextTheme(BuildContext context) {

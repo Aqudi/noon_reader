@@ -16,7 +16,7 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      saveLocale: false,
+      saveLocale: true,
       supportedLocales: const [Locale('en'), Locale('ko')],
       useOnlyLangCode: true,
       useFallbackTranslations: true,
@@ -56,7 +56,7 @@ class NoonReader extends HookConsumerWidget {
                   languageCode: settingService.setting.languageCode ??
                       initialLanguageCode,
                 );
-                settingService.update(setting);
+                settingService.update(setting, save: false);
                 return null;
               }, [initialLanguageCode]);
 

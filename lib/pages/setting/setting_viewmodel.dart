@@ -43,8 +43,10 @@ class SettingViewModel with ChangeNotifier {
         setting.copyWith(
           languageCode: value,
         ),
+        save: false,
       );
       await _settingService.updateLocale(context);
+      await _settingService.save();
     }
   }
 

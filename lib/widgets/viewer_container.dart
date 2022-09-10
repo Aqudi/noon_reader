@@ -42,7 +42,6 @@ class ViewerContainer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textStyle = Theme.of(context).textTheme.bodyText1;
-    print(textStyle?.fontFamily);
     return DefaultTextStyle(
       style: const TextStyle().merge(textStyle),
       child: Container(
