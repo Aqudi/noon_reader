@@ -1,20 +1,20 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:noon_reader/hooks/use_item_positions_listener.dart';
 import 'package:noon_reader/hooks/use_item_scroll_controller.dart';
+import 'package:noon_reader/models/history.dart';
 import 'package:noon_reader/pages/viewer/viewer_viewmodel.dart';
 import 'package:noon_reader/pages/viewer/widgets/history_viewer_container.dart';
 import 'package:noon_reader/widgets/loading_indicator.dart';
 
-import 'package:noon_reader/widgets/noon_app_bar.dart';
+// import 'package:noon_reader/widgets/noon_app_bar.dart';
 
 class ViewerPage extends HookConsumerWidget {
-  final PlatformFile? file;
+  final String? filePath;
 
-  const ViewerPage({Key? key, required this.file}) : super(key: key);
+  const ViewerPage({Key? key, required this.filePath}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,56 +23,80 @@ class ViewerPage extends HookConsumerWidget {
     final itemScrollController = useItemScrollController();
     final itemPositionsListener = useItemPositionsListener();
 
-    final fileIdentifier = kIsWeb ? file?.name : file?.path;
+    final filename = useMemoized(() => filePath?.split("/").last);
 
-    // ViewerContainer 초기화 후 실행해야하는 함수
-    final initializer = useCallback((ValueNotifier<bool> visible) {
-      // 이전 기록 가져오기
-      final initialIndex = viewerViewModel.getHistory(fileIdentifier);
+    final buildHistoryViewerContainer = useCallback((String? content) {
+      return HookBuilder(
+        builder: (context) {
+          final lines = useMemoized(() => content?.split("\n"));
 
-      // 기록된 index로 이동
-      Future.microtask(
-        () => itemScrollController.jumpTo(index: initialIndex),
-      ).then((value) {
-        // 초기화 완료
-        visible.value = true;
+          // Fetch last index and jump to last index
+          final historyCallback = useCallback(() {
+            final history = viewerViewModel.getHistory(filename);
+            return Future.microtask(
+              () => itemScrollController.jumpTo(index: history.index ?? 0),
+            );
+          }, []);
 
-        // 스크롤 모니터링 -> 기록
-        itemPositionsListener.itemPositions.addListener(() async {
-          final newIndex =
-              itemPositionsListener.itemPositions.value.first.index;
-          if (newIndex != 0) {
-            await viewerViewModel.saveHistory(fileIdentifier, newIndex);
-          }
-        });
-      });
+          // Record current index
+          final itemPositionCallback = useCallback(() {
+            saveHistory() async {
+              final newIndex =
+                  itemPositionsListener.itemPositions.value.first.index;
+              if (newIndex != 0) {
+                final newHistory = History(
+                  index: newIndex,
+                  maxIndex: lines?.length,
+                  path: filePath,
+                  timestamp: DateTime.now().millisecondsSinceEpoch,
+                );
+                viewerViewModel.saveHistory(filename, newHistory);
+              }
+            }
 
-      return null;
+            itemPositionsListener.itemPositions.addListener(() {
+              EasyDebounce.debounce(
+                'itemPositionsListener',
+                const Duration(milliseconds: 100),
+                () => saveHistory(),
+              );
+            });
+            return Future.microtask(() => saveHistory());
+          }, []);
+
+          return HistoryViewerContainer(
+            initializer: () async {
+              await historyCallback();
+              await itemPositionCallback();
+            },
+            content: lines ?? [],
+            setting: viewerViewModel.setting,
+            itemScrollController: itemScrollController,
+            itemPositionsListener: itemPositionsListener,
+          );
+        },
+      );
     }, []);
 
-    return Scaffold(
-      appBar: const NoonAppBar(),
-      body: FutureBuilder<String?>(
-        future: viewerViewModel.readFileAsString(file),
-        builder: (context, snapshot) {
-          Widget widget = const LoadingIndicator();
+    return SafeArea(
+      child: Scaffold(
+        // appBar: const NoonAppBar(),
+        body: FutureBuilder<String?>(
+          future: viewerViewModel.readFileAsString(filePath),
+          builder: (context, snapshot) {
+            Widget widget = const LoadingIndicator();
 
-          if (snapshot.hasData) {
-            widget = HistoryViewerContainer(
-              initializer: initializer,
-              content: snapshot.data,
-              setting: viewerViewModel.setting,
-              itemScrollController: itemScrollController,
-              itemPositionsListener: itemPositionsListener,
-            );
-          }
+            if (snapshot.hasData) {
+              widget = buildHistoryViewerContainer(snapshot.data);
+            }
 
-          if (snapshot.hasError) {
-            widget = Center(child: Text("에러 ${snapshot.error}"));
-          }
+            if (snapshot.hasError) {
+              widget = Center(child: Text("에러 ${snapshot.error}"));
+            }
 
-          return widget;
-        },
+            return widget;
+          },
+        ),
       ),
     );
   }

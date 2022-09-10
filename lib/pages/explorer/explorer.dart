@@ -20,7 +20,7 @@ class ExplorerPage extends HookConsumerWidget {
           final file = await explorerViewModel.pickFile();
           navigator.push(
             MaterialPageRoute(
-              builder: (_) => ViewerPage(file: file),
+              builder: (_) => ViewerPage(filePath: file?.path),
             ),
           );
         },

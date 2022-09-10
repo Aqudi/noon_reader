@@ -114,46 +114,22 @@ class SettingViewModel with ChangeNotifier {
     }
   }
 
-  void fontColorOnPressed(BuildContext context) async {
-    final value = await showFloatingModalBottomSheet(
-      context: context,
-      builder: (context) => OptionModal(
-          title: 'Font color',
-          options: const [
-            Colors.black,
-            Colors.white,
-            Colors.red,
-            Colors.blue,
-            Colors.green,
-            Colors.yellow
-          ],
-          builder: (value) => Row(
-                children: [
-                  Container(
-                    color: Color(value.value),
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.only(right: 16),
-                  ),
-                  Text(Color(value.value).toReadableName()),
-                ],
-              )),
-    );
-    if (value != null) {
+  void updateFontColor(Color? color) async {
+    if (color != null) {
       _settingService.update(
         setting.copyWith(
-          fontColor: value,
+          fontColor: color,
         ),
       );
       notifyListeners();
     }
   }
 
-  void backgroundColorOnPressed(Future<Color?> Function() builder) async {
-    final value = await builder();
-    if (value != null) {
+  void updateBackgroundColor(Color? color) async {
+    if (color != null) {
       _settingService.update(
         setting.copyWith(
-          backgroundColor: value,
+          backgroundColor: color,
         ),
       );
       notifyListeners();

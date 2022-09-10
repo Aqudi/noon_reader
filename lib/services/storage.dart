@@ -1,13 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_charset_detector/flutter_charset_detector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
+import 'package:noon_reader/top_level_provider.dart';
 
-final storageServiceProvider = Provider<StorageService>(
-  (ref) => throw UnimplementedError(),
-);
+final storageServiceProvider = Provider<StorageService>((ref) {
+  final logger = ref.read(loggerProvider);
+  return StorageService(logger);
+});
 
 enum BoxName {
   setting,
@@ -15,18 +20,19 @@ enum BoxName {
 }
 
 class StorageService {
+  final Logger _logger;
   final utf8Decoder = const Utf8Decoder();
+  final boxes = <BoxName, Box<String>>{};
+
+  StorageService(this._logger);
 
   bool initialized = false;
-  final boxes = <BoxName, Box<String>>{};
 
   Future<PlatformFile?> pickFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['txt'],
-        withReadStream: true,
-        withData: true,
       );
       if (result != null) {
         return result.files.single;
@@ -39,29 +45,41 @@ class StorageService {
     return null;
   }
 
-  Future<String?> readFileAsString(PlatformFile file) async {
-    if (file.bytes != null) {
-      return utf8Decoder.convert(file.bytes!);
+  Future<String?> readFileAsString(String? filePath) async {
+    _logger.d("Read file name: $filePath");
+    if (filePath != null) {
+      final file = File(filePath);
+      final bytes = await file.readAsBytes();
+      final result = await CharsetDetector.autoDecode(bytes);
+      _logger.d("charset: ${result.charset}");
+      return result.string;
     }
     return null;
   }
 
   Future<void> init() async {
-    await Hive.initFlutter();
-    for (final boxName in BoxName.values) {
-      final box = await Hive.openBox<String>(boxName.toString());
-      boxes.putIfAbsent(boxName, () => box);
+    if (!initialized) {
+      _logger.d("Initialize StorageService");
+      await Hive.initFlutter();
+      for (final boxName in BoxName.values) {
+        final box = await Hive.openBox<String>(boxName.toString());
+        boxes.putIfAbsent(boxName, () => box);
+      }
+      initialized = true;
+    } else {
+      _logger.d("StorageService is already initialized");
     }
-    initialized = true;
   }
 
   Future<void> put(
       BoxName boxName, String key, Map<String, dynamic> value) async {
+    _logger.d("put $boxName.$key = $value");
     await boxes[boxName]!.put(key, jsonEncode(value));
   }
 
   Map<String, dynamic>? get(BoxName boxName, String key) {
     try {
+      _logger.d("get $boxName.$key, ${boxes[boxName]?.keys}");
       if (boxes[boxName]!.get(key) != null) {
         return jsonDecode(boxes[boxName]!.get(key)!);
       }
@@ -69,6 +87,10 @@ class StorageService {
       return null;
     }
     return null;
+  }
+
+  List? getKeys(BoxName boxName) {
+    return boxes[boxName]?.keys.toList();
   }
 
   void delete(BoxName boxName, String key) {
